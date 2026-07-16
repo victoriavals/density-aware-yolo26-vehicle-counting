@@ -47,7 +47,7 @@ ByteTrack via pustaka `supervision` [26] + *virtual line crossing* (per arah, pe
 
 ## 8. Lingkungan Teknis & Kode
 - PyTorch + **Ultralytics 8.4.92**, Python, Roboflow, Mendeley (.bib).
-- **GPU: RTX 4060.** ⚠️ Dokumen tesis masih menulis "RTX 3060 8GB" di **5 lokasi** yang WAJIB diperbarui: Batasan 1.5, Tabel 3.6, subbab 2.5.2, 2.7.3, 3.6.2.
+- **GPU: RTX 4060 Ti 8GB** (terverifikasi `nvidia-smi` 13 Jul 2026). ⚠️ Dokumen tesis masih menulis "RTX 3060 8GB" di **5 lokasi** yang WAJIB diperbarui ke "RTX 4060 Ti 8GB": Batasan 1.5, Tabel 3.6, subbab 2.5.2, 2.7.3, 3.6.2.
 - Paket kode `model_tesis_lengkap.zip` (15 file, ±2.645 baris), terverifikasi terhadap Ultralytics 8.4.92, mencakup fase model hingga evaluasi.
 - Deployment: API *real-time* dari PC → website Traffic Detection PSM di `cam.geprekinaja.my.id` (React SPA). **Kode website DI LUAR scope tesis** — scope hanya model s.d. evaluasi.
 
@@ -74,3 +74,78 @@ Bahasa Indonesia akademik formal; Times New Roman 12pt, spasi 1,5; margin 3-3-3-
 4. Implementasi kode WAJIB mengikuti metodologi final: group split, protokol Wilcoxon (3 hipotesis utama + Holm), aturan MAPE y_t > 0, densitas dihitung ulang pasca-augmentasi.
 5. Pertahankan bahasa kehati-hatian *preprint* (2.3.5, 2.9, 3.5).
 6. Konfirmasi ke Naufal sebelum keputusan besar (perubahan desain, judul, struktur bab, atau apa pun yang menyentuh 7 keputusan pending).
+7. **Setiap akhir prompt/sesi:** perbarui §15 (Status & Log Progres) dengan hasil dan keputusan baru, lalu bersihkan kode/artefak temporer yang tidak dipakai lagi (artefak hasil eksperimen dan bukti metodologis JANGAN dihapus).
+8. **Log proses sesi:** setiap tindakan/keputusan/temuan/insiden signifikan di-append ke `logs/sesi.log` (format `[YYYY-MM-DD HH:MM] KATEGORI | isi`) — proses harus terdokumentasi, bukan hanya hasil. Job panjang tetap punya log keluaran sendiri (`logs/<nama>.log`, stempel waktu per baris, per-batch).
+
+## 13. Perintah Pengembangan
+
+Repositori ini berisi skrip Python murni (tanpa pyproject/requirements — instal manual). Peta lengkap berkas → subbab tesis ada di `README.md`.
+
+```bash
+# Lingkungan SUDAH TERPASANG di .venv (Python 3.11.9) — pakai:
+#   Windows: .\.venv\Scripts\python.exe   (bash: ./.venv/Scripts/python.exe)
+# Isi: torch 2.11.0+cu128, ultralytics==8.4.92, supervision 0.29.1 (WAJIB <0.30,
+# sv.ByteTrack dihapus di 0.30), roboflow, scipy, pandas, matplotlib
+
+# Uji — skrip biasa, BUKAN pytest; tiap file menjalankan seluruh kasusnya berurutan.
+# Jalankan satu kasus dengan mengimpor fungsinya: python -c "from test_smoke import t1_math; t1_math()"
+python test_smoke.py            # T1-T4: matematika DALW, arsitektur, transfer bobot, loss E2E (unduh yolo26s.pt sekali)
+python test_smoke.py --no-net   # lewati uji yang butuh unduhan
+python test_nmsfree.py          # U1-U5: matcher, DR/CM, stabilitas, forward internal
+python test_eval.py             # E1-E7: strata, AP, Wilcoxon/Holm, counting
+
+# Dataset: dataset/ AKTIF = hasil re-split lokal berbasis grup 70/20/10 (§15 P2).
+# Ekspor Roboflow ASLI (split bocor) hanya tersisa sebagai arsip traffic-merged.yolo26.zip;
+# regenerasi bila perlu: ekstrak zip -> dataset_raw/ lalu python make_group_split.py
+# (deterministik; bukti_split_*.csv ikut ditulis ulang)
+
+# Eksperimen (urutan wajib; jalankan sebagai BACKGROUND process + log ber-stempel-waktu)
+# Konvensi log (bash) — pecah \r per baris, buang ANSI + glyph bar (ASCII murni), stempel per baris;
+# WAJIB --project ABSOLUT (runs_dir gotcha, lihat §15 P3):
+#   <perintah> 2>&1 | awk 'BEGIN{RS="\r|\n"} { gsub(/\x1b\[[0-9;]*[a-zA-Z]/,""); gsub(/[\xe2][\x94-\x95][\x80-\xbf]/,""); if ($0 != "") print strftime("[%Y-%m-%d %H:%M:%S]"), $0; fflush() }' > logs/<nama>.log
+# Pantau dari PowerShell: Get-Content logs\<nama>.log -Wait -Tail 30 -Encoding UTF8
+python train_ablation.py --data dataset/data.yaml --tune-dalw --tune-epochs 60  # grid α,σ → dalw_best.json
+python train_ablation.py --data dataset/data.yaml --variant all                 # V1..V8, seed 0
+python train_ablation.py --data dataset/data.yaml --variant V5 --resume         # lanjut bila terputus
+
+# Evaluasi (setelah semua varian selesai)
+python evaluate_all.py --data dataset/data.yaml --split test --variants all     # → eval_out/
+python analyze_nmsfree.py --data dataset/data.yaml --split test --runs runs_tesis # → nmsfree_out/
+python y26_counting.py --video klip.mp4 --weights runs_tesis/V8/weights/best.pt \
+    --line x1,y1,x2,y2 --interval-s 60 --gt gt.csv                              # → counting_out/
+```
+
+`test_smoke.py` WAJIB lulus sebelum training apa pun. Kode dikunci pada ultralytics **8.4.92** karena `DALWDetectionLoss` menyalin metode internal `get_assigned_targets_and_loss` (utils/loss.py:400-463) versi tersebut; bila versi berubah dan T4 gagal, jangan lanjut sebelum disesuaikan.
+
+## 14. Arsitektur Kode
+
+Seluruh kode adalah **lapisan patch/injeksi di atas ultralytics terpasang** — tidak ada fork. Tiga mekanisme injeksi yang harus dipahami bersama:
+
+1. **HAM via namespace injection** (`y26_modules.register_ham()`): kelas `HAM` di-setattr ke `ultralytics.nn.tasks` (parse_model meresolusi nama YAML via globals()) + `ultralytics.nn.modules` + alias `sys.modules["y26_modules"]` agar `torch.load` checkpoint menemukan kelasnya. **Setiap entry point yang membangun/memuat model ber-HAM wajib memanggil `register_ham()` lebih dulu** — semua skrip evaluasi sudah melakukannya.
+2. **DALW via monkey-patch loss** (`y26_dalw.apply_dalw(α,σ)`): mengganti `DetectionModel.init_criterion` secara global agar `E2ELoss` dibangun dengan `DALWDetectionLoss` pada KEDUA cabang head (keputusan A-11). Harus dipanggil SEBELUM `model.train()` (trainer membangun ulang model). Bobot w_i dihitung DI DALAM loss dari label batch (otomatis pasca-augmentasi, `torch.no_grad`).
+3. **Varian via YAML programatis** (`y26_variants`): YAML HAM dibangkitkan dari YAML resmi terpasang (`yolo26.yaml`/`yolo26-p2.yaml`) dengan sisipan setelah blok C3k2 indeks 4 & 6 dan pemetaan ulang seluruh indeks head (`_new_index`); transfer bobot COCO memetakan ulang nama parameter untuk mengatasi pergeseran indeks. Hasil transfer disimpan ke `inits/{V}_init.pt` karena transfer in-memory hilang saat trainer membangun ulang model.
+
+**Konvensi akses kepala one-to-one mentah:** seluruh evaluasi (DR/CM, cache strata, counting) SENGAJA melewati predictor standar — forward langsung `DetectionModel` mode eval mengembalikan `(B, 300, 6)` `[xyxy, conf, cls]` pada ruang letterbox 640, dan GT ditransformasikan ke ruang yang sama via `_letterbox` bersama di `y26_nmsfree.py`. `train_format_forward` hanya menaikkan flag `training` milik modul Detect (bukan `.train()`) agar dict dual-head keluar tanpa merusak statistik BN.
+
+**Alur data eksperimen:**
+```
+train_ablation.py ──→ runs_tesis/<V>/ (results.csv, weights/{best,last}.pt, nmsfree_probe.csv)
+     │  (dalw_best.json dibaca otomatis; probe NMSFreeProbe per epoch via callback)
+     ├─ evaluate_all.py ──→ eval_out/ (global_metrics.csv, strata_ap.csv, wilcoxon_*.csv, cache_<V>.npz dipakai ulang)
+     ├─ analyze_nmsfree.py ──→ nmsfree_out/ (summary.csv, tau_sweep.csv, per-image CSV, plot)
+     └─ y26_counting.py ──→ counting_out/ (counts, events, errors, summary.json berisi MAE/RMSE/MAPE/FPS)
+```
+Rantai dependensi modul: `y26_modules` ← `y26_variants` ← `train_ablation`; `y26_nmsfree` menyediakan `_letterbox`/`split_image_paths` yang dipakai `y26_strata`; `y26_stats` mengonsumsi baris `stratified_ap`. Folder `runs_tesis/`, `eval_out/`, `nmsfree_out/` adalah bahan mentah BAB 4 — jangan dihapus/ditimpa.
+
+**Invarian metodologis yang dikodekan (jangan dilonggarkan):** konfigurasi identik antarvarian (seed 0, batch sama untuk kedelapan varian — bila OOM turunkan untuk SEMUA); tier strata default oklusi 0,10/0,35, densitas 10/26, ukuran konvensi COCO; unit Wilcoxon = AP per (kelas × strata) tanpa baris global, 3 hipotesis utama tanpa koreksi + sekunder Holm; MAPE hanya y>0 dengan proporsi eksklusi dilaporkan; pejalan kaki dikecualikan dari counting.
+
+## 15. Status & Log Progres Eksperimen (perbarui tiap prompt — aturan §12.7)
+
+Eksperimen mengikuti 10 prompt berurutan di `prompts_claude_code_nfl_v2.md`, **adaptasi Windows native (Opsi A)**: tanpa Zellij/WSL (WSL tak berdistribusi di PC ini); job panjang = background process + log `logs/<nama>.log`; pantau: `Get-Content logs\<nama>.log -Wait -Tail 30`.
+
+- **P1 ✅ (13 Jul 2026) — Lingkungan.** `.venv` Python 3.11.9; torch 2.11.0+cu128; ultralytics 8.4.92; supervision 0.29.1; CUDA aktif pada **RTX 4060 Ti 8GB**. `test_smoke.py` T1–T4 **LULUS** (transfer bobot: HAM 97% kunci/100% param; P2 40%/62%; HAM+P2 40%/63% — bahan paragraf inisialisasi BAB 4). Log: `logs/smoke.log`.
+- **P2 ✅ (13 Jul 2026) — Dataset.** Ekspor Roboflow manual (dari `sahabats-workspace/traffic-merged-qke0k-3yyyo-nkdvt` — ⚠️ beda dengan sitasi [17], konsistenkan di naskah) berproporsi 83,4/12,6/4,0 dan **bocor** (3 pasang citra byte-identik lintas split) → atas persetujuan Naufal, re-split lokal berbasis grup via `make_group_split.py` → **2.372/679/338 citra (70,0/20,0/10,0), grup 672/53/33, 0 pelanggaran md5/grup**; komposisi kelas test min. 332 instans/kelas. Hasil split kini menjadi **`dataset/` aktif** (ekspor asli yang bocor dihapus; arsipnya `traffic-merged.yolo26.zip` di root, integritas terverifikasi 3.389 citra+label). Bukti lampiran: `bukti_split_grup.csv` (758 grup) + `bukti_split_citra.csv`. Catatan naskah: angka split final 2.372/679/338; metode proksi grup (frame_N per resolusi; timestamp per tanggal; union md5) perlu didokumentasikan di BAB 3/4. Log: `logs/group_split.log`, `logs/dataset_group_verify.log`. Log lama ber-header waktu pembuatan; sejak P3 semua log ber-stempel waktu per baris (konvensi awk di §13).
+- **P3 ✅ SELESAI (13 Jul 15:58 – 15 Jul 19:15) — Grid search α,σ** 3×3 pada V8, 540 epoch (60×9) tanpa crash. **Pemenang:** α=1,0 σ=0,1 → mAP50-95(val)=0,6670 (Tabel 3.1 BAB 4). Pola: α=1,0 konsisten mendominasi ranking 1,2,5; σ=0,1 sweet spot kernel radius menengah; α=0,5 terlemah (pemboboran densitas terlalu lemah); α=2,0 kompetitif σ tinggi tapi merosot σ rendah (agresif). `dalw_best.json` otomatis tertulis. **Resolusi insiden sebelumnya:** (a) percobaan-1 path salah (settings.json) → perbaiki + relaunch `--project` ABSOLUT; (b) ✅ **BUG NMSFreeProbe** (de_parallel) diperbaiki 13 Jul 16:21 (unwrap_model, test_nmsfree.py U1–U5 LULUS); (c) **job terbukti selamat tutup VS Code** (proses OS tetap hidup ~41 jam, laju stabil ~5,7 mnt/epoch). Log: `logs/tune.log` (per-batch), ringkasan `hasil/grid_search.md`. Observasi: GPU_mem 9,3 GB spill shared memory (normal, no OOM).
+- **P4 ✅ SELESAI (16 Jul 11:21) — Rangkum grid.** Tabel 9 kombinasi (Tabel 3.1), pola analisis (α smart, σ=0,1 sweet spot), prasyarat P5 OK. Dokumen: `hasil/grid_search.md`.
+- **P5 ⏳ SIAP — Latih 8 varian (V1–V8)** dengan α=1,0 σ=0,1 (dari `dalw_best.json`), maks 300 epoch + early stopping, seed 0. Prioritas: V1→V4→V8 (kriteria ablasi §3.8). Estimasi: ±7–10 hari (V8 longest, P2/HAM mungkin batch reduce → gradient accum). Keluaran: `runs_tesis/V{1-8}/` (results.csv, nmsfree_probe.csv per epoch).
+- P6–P10 belum: monitor V1-V8 → evaluasi strata & Wilcoxon → analisis NMS-free (DR/CM/τ sweep) → validasi oklusi manual → counting ByteTrack (RQ5) → konsolidasi BAB 4 hasil eksperimen.
