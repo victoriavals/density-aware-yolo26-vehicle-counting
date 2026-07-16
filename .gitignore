@@ -1,6 +1,7 @@
 .venv/
 __pycache__/
 logs/
+anotasi_oklusi/imgs/
 dataset/
 dataset_raw/
 *.zip
