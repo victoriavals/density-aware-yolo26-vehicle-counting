@@ -1,0 +1,22 @@
+# Git LFS — large model artifacts (trained weights).
+# See ../.agents/knowledge/devops.md → "Version control & model artifacts".
+#
+# ⚠️ INERT until you stop gitignoring these patterns. Right now `.gitignore`
+# contains `*.pt`, so git ignores weights entirely and LFS never sees them.
+#
+# To START versioning weights via LFS (non-destructive, no history rewrite —
+# nothing is tracked yet):
+#   1) git lfs install                       # once per machine
+#   2) edit .gitignore: remove the `*.pt` line (keep dataset/, *.zip ignored)
+#   3) git add .gitattributes yolo26n.pt yolo26s.pt <your-best>.pt
+#   4) git commit -m "chore: track model weights via Git LFS"
+#
+# Datasets and *.zip stay OUT of git/LFS (too large for GitHub LFS free tier).
+# Keep them reproducible via download_dataset.py, or use DVC with an external
+# remote (Google Drive / S3). See devops.md for the tradeoff.
+
+*.pt      filter=lfs diff=lfs merge=lfs -text
+*.pth     filter=lfs diff=lfs merge=lfs -text
+*.onnx    filter=lfs diff=lfs merge=lfs -text
+*.engine  filter=lfs diff=lfs merge=lfs -text
+*.tflite  filter=lfs diff=lfs merge=lfs -text
