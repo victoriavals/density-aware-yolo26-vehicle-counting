@@ -309,9 +309,10 @@ class NMSFreeProbe:
 
     def __call__(self, trainer):
         try:
-            from ultralytics.utils.torch_utils import de_parallel
+            # ultralytics 8.4.92: de_parallel telah berganti nama menjadi unwrap_model
+            from ultralytics.utils.torch_utils import unwrap_model
 
-            m = de_parallel(trainer.model)
+            m = unwrap_model(trainer.model)
             self._ensure(next(m.parameters()).device)
 
             assigns, astats = extract_o2o_assignments(m, self.batch)
