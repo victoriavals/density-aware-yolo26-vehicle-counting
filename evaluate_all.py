@@ -100,7 +100,8 @@ def main():
             f = out / f"wilcoxon_{metric}.csv"
             with open(f, "w", newline="") as fh:
                 cols = ["pair", "family", "metric", "n", "n_eff", "W", "p", "p_holm",
-                        "median_diff", "mean_diff", "signif_5pct"]
+                        "median_diff", "mean_diff", "rank_biserial", "W_plus", "W_minus",
+                        "signif_5pct"]
                 w = csv.DictWriter(fh, fieldnames=cols)
                 w.writeheader()
                 for r in res:
@@ -111,7 +112,7 @@ def main():
                 for r in res:
                     if r["family"] == "primary":
                         print(f"  [UTAMA] {r['pair']:>9}: W={r['W']:.1f} p={r['p']:.4g} "
-                              f"median Δ={r['median_diff']:+.4f} -> "
+                              f"median Δ={r['median_diff']:+.4f} r={r['rank_biserial']:+.3f} -> "
                               f"{'SIGNIFIKAN' if r['signif_5pct'] else 'tidak signifikan'} (5%)")
         (out / "wilcoxon_info.json").write_text(json.dumps(dict(
             unit="AP per (kelas x strata ukuran/oklusi/densitas), global dikecualikan",
