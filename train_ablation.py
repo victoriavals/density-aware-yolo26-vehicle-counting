@@ -49,6 +49,11 @@ def train_once(args, variant: str, run_name: str, epochs: int, alpha: float, sig
         model = YOLO(src)
     print(f"[{run_name}] sumber bobot: transfer={report}")
 
+    from y26_complexity import ComplexityCallback
+    cx = ComplexityCallback()
+    model.add_callback("on_train_start", cx.on_train_start)
+    model.add_callback("on_train_end", cx.on_train_end)
+
     if getattr(args, "probe", 0) > 0:
         from y26_nmsfree import NMSFreeProbe
 
