@@ -15,8 +15,25 @@ import numpy as np
 PRIMARY_PAIRS = (("V8", "V1"), ("V4", "V1"), ("V8", "V5"))
 
 
+def rank_biserial(d: np.ndarray) -> tuple[float, float, float]:
+    """Korelasi rank-biserial (Persamaan 3.15): r = (W+ - W-) / (W+ + W-).
+
+    Ukuran efek untuk Wilcoxon signed-rank; rentang -1..+1, positif berarti
+    x konsisten lebih unggul dari y. Selisih nol dibuang (metode 'wilcox'),
+    peringkat memakai rata-rata untuk nilai kembar (ties).
+    """
+    from scipy.stats import rankdata
+
+    d = d[d != 0]
+    if len(d) == 0:
+        return float("nan"), 0.0, 0.0
+    r = rankdata(np.abs(d))
+    wp, wm = float(r[d > 0].sum()), float(r[d < 0].sum())
+    return (wp - wm) / (wp + wm), wp, wm
+
+
 def wilcoxon_pair(x, y, alternative: str = "two-sided") -> dict:
-    """Wilcoxon berpasangan x vs y (drop pasangan NaN; selisih nol dibuang, metode 'wilcox')."""
+    """Wilcoxon berpasangan x vs y + ukuran efek (drop pasangan NaN; selisih nol dibuang)."""
     from scipy.stats import wilcoxon
 
     x = np.asarray(x, float); y = np.asarray(y, float)
@@ -24,9 +41,11 @@ def wilcoxon_pair(x, y, alternative: str = "two-sided") -> dict:
     x, y = x[m], y[m]
     d = x - y
     n_eff = int((d != 0).sum())
+    r_rb, wp, wm = rank_biserial(d)
     out = dict(n=int(m.sum()), n_eff=n_eff,
                median_diff=float(np.median(d)) if len(d) else float("nan"),
-               mean_diff=float(np.mean(d)) if len(d) else float("nan"))
+               mean_diff=float(np.mean(d)) if len(d) else float("nan"),
+               rank_biserial=r_rb, W_plus=wp, W_minus=wm)
     if n_eff < 1:
         out.update(W=0.0, p=1.0)
         return out
