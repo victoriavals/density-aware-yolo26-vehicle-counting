@@ -28,7 +28,7 @@ loss end-to-end).
 ## Persiapan lingkungan (PC RTX 4060)
 
 ```bash
-# Python 3.10+ disarankan dalam virtualenv/conda
+# Python 3.11.9 dalam virtualenv/conda
 pip install ultralytics==8.4.92 "supervision>=0.25,<0.30" roboflow
 python -c "import torch; print(torch.cuda.is_available())"   # harus True
 python test_smoke.py    # semua uji harus LULUS sebelum lanjut
