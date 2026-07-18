@@ -1,0 +1,10 @@
+{
+  "unit": "AP per (kelas x strata ukuran/oklusi/densitas), global dikecualikan",
+  "primary": [
+    "V8 vs V1",
+    "V4 vs V1",
+    "V8 vs V5"
+  ],
+  "secondary": "seluruh pasangan lain, koreksi Holm",
+  "alpha": 0.05
+}
