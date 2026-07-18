@@ -1,0 +1,23 @@
+{
+  "$comment": "Committed team-wide settings for the YOLO26 thesis repo. Only read-only / test-safe commands are pre-allowed here; mutating actions (git add/commit/push, rm, launching training) are intentionally omitted so they still prompt. Personal/machine-specific allows live in settings.local.json. See .agents/AGENTS.md and .agents/rules/logging-and-status.md.",
+  "permissions": {
+    "allow": [
+      "Bash(git -C \"d:/computer-vision/density-aware-yolo26-vehicle-counting\" status:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git remote:*)",
+      "Bash(python test_smoke.py:*)",
+      "Bash(python test_nmsfree.py:*)",
+      "Bash(python test_eval.py:*)",
+      "Bash(.venv/Scripts/python.exe test_smoke.py:*)",
+      "Bash(.venv/Scripts/python.exe test_nmsfree.py:*)",
+      "Bash(.venv/Scripts/python.exe test_eval.py:*)"
+    ],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(python train_ablation.py:*)"
+    ]
+  }
+}
