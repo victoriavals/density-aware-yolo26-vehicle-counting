@@ -2,6 +2,10 @@
 __pycache__/
 logs/
 anotasi_oklusi/imgs/
+backups/
+counting_out/
+video_uji/*
+!video_uji/README.md
 dataset/
 dataset_raw/
 *.zip
