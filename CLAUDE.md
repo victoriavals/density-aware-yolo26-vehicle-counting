@@ -5,10 +5,11 @@
 > **Basis pengetahuan diperluas (agent-facing).** Dokumen ini tetap SSOT ringkas. Untuk ekspansi navigable — arsitektur/injeksi kode, pengetahuan per-domain, aturan, status, dan playbook — lihat [`.agents/`](.agents/README.md), mulai dari [`.agents/AGENTS.md`](.agents/AGENTS.md). Skill operasional ada di [`.claude/skills/`](.claude/skills/). Bila `.agents/` berbeda dari kode/CLAUDE.md, **kode & CLAUDE.md menang**.
 
 ## 1. Identitas Tesis
-- **Judul (final terbaru):** MODIFIKASI DETEKTOR *NMS-FREE* YOLO26 DENGAN PEMBOBOTAN *LOSS* BERBASIS DENSITAS DAN PELACAKAN BYTETRACK UNTUK PENGHITUNGAN KENDARAAN *REAL-TIME* PADA LALU LINTAS HETEROGEN PADAT
+- **Judul (final — diputuskan Naufal 18 Jul 2026, mengikuti dokumen revisi pembimbing):** MODIFIKASI ARSITEKTUR YOLO26 MELALUI ATENSI HIBRIDA, DETEKSI MULTI-SKALA P2, DAN PEMBOBOTAN *LOSS* BERBASIS DENSITAS UNTUK PENGHITUNGAN KENDARAAN *REAL-TIME* PADA LALU LINTAS HETEROGEN PADAT
 - **Penulis:** Naufal Firdaus — NIM 20240804017
 - **Program:** Magister Ilmu Komputer, Fakultas Ilmu Komputer, Universitas Esa Unggul
 - **Pembimbing:** Ibu Sandfreni — sandfreni@esaunggul.ac.id (bimbingan offline Sabtu di kampus)
+- ⚠️ **Judul menyebut HAM & P2 secara DESKRIPTIF, TIDAK mengubah framing kebaruan** — dua-pilar §3 tetap berlaku (HAM/P2 = instrumen, bukan klaim kebaruan; lihat §12.2). Ini keputusan sadar Naufal: judul mendaftar komponen yang dimodifikasi, sementara klaim kebaruan (DALW + analisis NMS-free) tetap di badan/abstrak. Judul lama "MODIFIKASI DETEKTOR *NMS-FREE* … DAN PELACAKAN BYTETRACK" DIPENSIUNKAN.
 - ⚠️ Verifikasi judul konsisten di halaman judul, ABSTRAK/ABSTRACT, dan seluruh bab; jangan pernah memakai frasa lama "berbasis ukuran objek".
 
 ## 2. Ringkasan Penelitian
@@ -49,20 +50,20 @@ ByteTrack via pustaka `supervision` [26] + *virtual line crossing* (per arah, pe
 
 ## 8. Lingkungan Teknis & Kode
 - PyTorch + **Ultralytics 8.4.92**, Python, Roboflow, Mendeley (.bib).
-- **GPU: RTX 4060 Ti 8GB** (terverifikasi `nvidia-smi` 13 Jul 2026). ⚠️ Dokumen tesis masih menulis "RTX 3060 8GB" di **5 lokasi** yang WAJIB diperbarui ke "RTX 4060 Ti 8GB": Batasan 1.5, Tabel 3.6, subbab 2.5.2, 2.7.3, 3.6.2.
+- **GPU: RTX 4060 Ti 8GB** (terverifikasi `nvidia-smi` 13 Jul 2026, nama perangkat "NVIDIA GeForce RTX 4060 Ti"). ⚠️ Dokumen revisi pembimbing sudah **memperbaiki "RTX 3060" → "RTX 4060"** di semua lokasi (Batasan 1.6, subbab 2.5.2, 2.7.3, 3.6.2, Tabel 3.8) — TETAPI menulis **"RTX 4060 8GB" tanpa "Ti"**. Sisa tugas naskah: tambahkan **"Ti"** agar seragam **"RTX 4060 Ti 8GB"** (perangkat asli ber-Ti). Bukan lagi soal "3060".
 - Paket kode `model_tesis_lengkap.zip` (15 file, ±2.645 baris), terverifikasi terhadap Ultralytics 8.4.92, mencakup fase model hingga evaluasi.
 - Deployment: API *real-time* dari PC → website Traffic Detection PSM di `cam.geprekinaja.my.id` (React SPA). **Kode website DI LUAR scope tesis** — scope hanya model s.d. evaluasi.
 
 ## 9. Status Pekerjaan
-- BAB 1–3 **final** (`TESIS_BAB1-3_FINAL_v2.docx`); audit sitasi selesai: 27 referensi IEEE bracket urut kemunculan pertama, semua ber-URL/DOI (satu pengecualian *paywalled*: Wilcoxon 1945 di JSTOR).
-- BAB 4–5 **belum ditulis**; **18 placeholder numerik** ([XX,X], [0,0XX], dll.) + 2 placeholder naratif menunggu hasil eksperimen.
-- Bibliografi siap: `Daftar_Pustaka_Gabungan_BAB1-3.bib` (urutan entri = [1]–[27]).
+- BAB 1–3 **final — versi otoritatif kini `TESIS_BAB1-3_REVISI_PEMBIMBING`** (menggantikan `TESIS_BAB1-3_FINAL_v2.docx`); audit sitasi: **30 referensi** IEEE bracket ([1]–[30]) urut kemunculan pertama, semua ber-URL/DOI (satu pengecualian *paywalled*: Wilcoxon 1945 [30] di JSTOR). Naskah bertambah dari 27 → 30 (a.l. RT-DETR [19], YOLO-World [20], YOLOE [21], survei atensi [22], SE-Net [23], Focal Loss [24], Ultralytics [28], supervision [29]).
+- BAB 4–5 **belum ditulis**; **18 placeholder numerik** ([XX,X], [0,0XX], dll.) + 2 placeholder naratif menunggu hasil eksperimen (hasil P7 sudah ada di `hasil/ringkasan_evaluasi.md`, tetapi pengisian menunggu keputusan A-01).
+- Bibliografi: `Daftar_Pustaka_Gabungan_BAB1-3.bib` — ⚠️ **verifikasi jumlah entri sesuai [1]–[30]** dokumen revisi (catatan lama menyebut [1]–[27]; rekonsiliasikan bila masih 27).
 
 ## 10. TODO
 1. Implementasi *group-based split* SEBELUM pelatihan apa pun; simpan daftar grup per subset sebagai bukti.
 2. Jalankan eksperimen: grid search → V1–V8 (prioritas V1→V4→V8; *fallback* batch 8 + *gradient accumulation* untuk varian ber-P2) → instrumentasi NMS-free → sensitivitas α (V4) dan τ → stratifikasi → Wilcoxon+Holm → penghitungan ByteTrack.
 3. Isi 18 placeholder; tulis BAB 4–5.
-4. Update RTX 3060 → RTX 4060 di 5 lokasi (§8).
+4. GPU naskah: tambahkan "**Ti**" (revisi pembimbing sudah 3060→4060; kini "RTX 4060 8GB" → target "RTX 4060 Ti 8GB", §8).
 5. **7 keputusan pending:** (A-10) formalisasi metrik stabilitas *assignment* + sensitivitas τ {0,10; 0,25; 0,50}; (A-11) tentukan *head* YOLO26 penerima wᵢ setelah verifikasi kode (o2m/o2o/keduanya); (A-12) strategi komputasi 8 varian pada GPU 8GB VRAM: *patience early-stopping* eksplisit + *checkpoint-resume*; (A-02) target konkret RQ5 (mis. ambang MAPE & FPS); (A-03) verifikasi angka MST-YOLO (+8,42%; 70,97%) dan HIC-YOLOv5 (+6,42%) ke sumber [12][13]; (A-01) redaksi alternatif abstrak bila hasil tidak signifikan; (B-01) cek batas kata abstrak (±360).
 6. Naskah: revisi manual gambar tersisa (pangkas kotak G1.3/2.1/2.2/2.3/3.4; teks G2.3 "8–16 piksel" & hapus "+5–7% mAP"; margin G3.1; label G3.5), tempel Daftar Pustaka, Lampiran 1, halaman administratif.
 
@@ -72,7 +73,7 @@ Bahasa Indonesia akademik formal; Times New Roman 12pt, spasi 1,5; margin 3-3-3-
 ## 12. Aturan Kerja untuk Claude Code
 1. Jaga konsistensi istilah, angka, dan framing dua-pilar lintas bab; istilah utama "Pembobotan *Loss* Berbasis Densitas" (DALW hanya di tabel/nama varian).
 2. **JANGAN PERNAH** mengklaim HAM atau P2 sebagai kebaruan.
-3. **JANGAN** mengisi/mengubah placeholder tanpa data eksperimen nyata; **JANGAN** menambah/menghapus/menggeser nomor sitasi [1]–[27]; **JANGAN** menulis BAB 4–5 sebelum ada hasil.
+3. **JANGAN** mengisi/mengubah placeholder tanpa data eksperimen nyata; **JANGAN** menambah/menghapus/menggeser nomor sitasi [1]–[30]; **JANGAN** menulis BAB 4–5 sebelum ada hasil.
 4. Implementasi kode WAJIB mengikuti metodologi final: group split, protokol Wilcoxon (3 hipotesis utama + Holm), aturan MAPE y_t > 0, densitas dihitung ulang pasca-augmentasi.
 5. Pertahankan bahasa kehati-hatian *preprint* (2.3.5, 2.9, 3.5).
 6. Konfirmasi ke Naufal sebelum keputusan besar (perubahan desain, judul, struktur bab, atau apa pun yang menyentuh 7 keputusan pending).
@@ -156,3 +157,4 @@ Eksperimen mengikuti 10 prompt berurutan di `prompts_claude_code_nfl_v2.md`, **a
 - **Persiapan P9 ✅ (18 Jul 14:15)** — Kit counting siap: `siapkan_counting.py` (inspeksi video + preview garis/grid/panah in-out + `--make-gt-template` → kerangka `gt_<nama>.csv`) + `video_uji/README.md` (panduan langkah demi langkah). Diverifikasi pada video sintetis lalu artefak uji dihapus. `.gitignore`: `video_uji/*` (kecuali README) + `counting_out/`. Naufal tinggal: rekam klip → pilih garis → isi hitung manual → jalankan `y26_counting.py` (Tahap 3c README).
 - P8–P10 belum: validasi oklusi manual (kit `anotasi_oklusi/` siap → `manual_oklusi.csv`) → counting ByteTrack RQ5 (kit `video_uji/` siap; butuh video uji + `gt_<nama>.csv` + ambang **A-02** dari pembimbing) → konsolidasi peta placeholder BAB 4 (P10).
 - **KB Agen ✅ (18 Jul 2026) — Basis pengetahuan `.agents/` + skill `.claude/`.** Dibuat basis pengetahuan agent-facing **bilingual** (narasi Indonesia + TL;DR Inggris), 33 berkas: `.agents/` (README, AGENTS, 00-overview, MAINTENANCE + `architecture/` [code-injection, data-flow, variants] + `knowledge/` [thesis-framing, dalw, ham, p2-layer, nmsfree-analysis, evaluation, statistics, counting, dataset, environment] + `rules/` [methodology-invariants, writing-standards, working-rules, logging-and-status] + `status/` [progress, pending-decisions, document-todos] + `playbooks/` [run-experiment, evaluate, occlusion-validation, write-bab4-5]) dan 5 skill `.claude/skills/` (jalankan-eksperimen, cek-invarian-metodologi, perbarui-status-log, smoke-test, isi-placeholder-bab4) + `.claude/settings.json` (allowlist read-only/uji). Pointer ke `.agents/` ditambah di atas (§awal). Divalidasi: 0 tautan rusak, framing HAM/P2=instrumen utuh di semua berkas, angka konsisten dengan §15. Disusun sebagian via workflow multi-agen (kena batas sesi di tengah) lalu dilengkapi manual. ⚠️ **TEMUAN saat menyerap `TESIS_BAB1-3_REVISI_PEMBIMBING.docx`:** judul dokumen fisik ("MODIFIKASI **ARSITEKTUR** YOLO26 **MELALUI ATENSI HIBRIDA, DETEKSI MULTI-SKALA P2**, DAN PEMBOBOTAN LOSS BERBASIS DENSITAS…") **BERBEDA** dari judul §1 SSOT ("MODIFIKASI **DETEKTOR NMS-FREE** YOLO26 DENGAN PEMBOBOTAN LOSS…**DAN PELACAKAN BYTETRACK**…") — dokumen menaruh HAM/P2 (instrumen) di judul. Perlu **konfirmasi Naufal + pembimbing** (dicatat di `.agents/status/pending-decisions.md`). Diskrepansi lain tercatat: jumlah sitasi §9 tertulis 27 vs DAFTAR PUSTAKA dokumen **[1]–[30]**.
+- **KB verifikasi & judul RESOLVED ✅ (18 Jul 2026) — verifikasi KB terhadap PDF revisi pembimbing + keputusan Naufal.** Naufal mengirim PDF `TESIS_BAB1-3_REVISI_PEMBIMBING` dan memutuskan **3 hal** (via pertanyaan): (1) **JUDUL FINAL = versi dokumen pembimbing** ("MODIFIKASI ARSITEKTUR YOLO26 MELALUI ATENSI HIBRIDA, DETEKSI MULTI-SKALA P2, DAN PEMBOBOTAN *LOSS* BERBASIS DENSITAS…") — judul lama NMS-free+ByteTrack DIPENSIUNKAN; (2) **framing dua-pilar TETAP** — HAM/P2 di judul bersifat DESKRIPTIF, bukan klaim kebaruan (§12.2 utuh, konsisten dgn badan §3.6 dokumen sendiri); (3) scope = verifikasi & perbarui KB, jangan tulis ulang. Tindakan: §1 judul disamakan + catatan dua-pilar; §8/§10 GPU (temuan: dokumen sudah "RTX 4060" di SEMUA lokasi, "3060" TUNTAS — sisa tambah "Ti"→"RTX 4060 Ti"); §9/§12.3 sitasi 27→**30** ([1]–[30] otoritatif, dok revisi jadi versi final BAB 1–3, rekonsiliasi `.bib`). KB disinkronkan di 8 berkas (pending-decisions, thesis-framing, AGENTS, 00-overview, p2-layer, document-todos, writing-standards, environment) + README. Cross-check KB vs PDF: konsisten penuh (evaluation.md ✅ Tabel 3.7 kompleksitas; statistics.md ✅ rank-biserial Pers. 3.15 + hasil P7). Diskrepansi tersisa (Roboflow source, verifikasi jumlah entri `.bib`) tetap terbuka.
