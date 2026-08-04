@@ -4,15 +4,24 @@ Folder ini menampung klip CCTV uji untuk evaluasi penghitungan end-to-end
 (Subbab 3.10–3.11, Pers. 3.12–3.14). **Isi folder ini dikecualikan dari git**
 kecuali README ini.
 
-## Yang perlu Anda (Naufal) siapkan
+## Yang perlu Anda (Naufal) siapkan — sesuai protokol naskah Subbab 3.10.1
 
-1. **Beberapa klip video CCTV** (mis. `uji_ruas1.mp4`, `uji_ruas2.mp4`).
-   - Adegan lalu lintas heterogen padat (sesuai domain tesis).
-   - Durasi cukup untuk beberapa interval pengamatan (mis. ≥5 menit bila interval 60 s).
-   - Format terbaca OpenCV (mp4/H.264 aman). Idealnya beda ruas/sudut untuk variasi.
-2. **Hitung manual per interval** → `gt_<nama>.csv` (kerangka dibuat otomatis, lihat di bawah).
-3. **Ambang lulus RQ5** (keputusan pending **A-02**) — angka MAPE & FPS target. Ini
-   keputusan naskah bersama pembimbing; skrip hanya melaporkan angkanya.
+1. **Sekurang-kurangnya 3 klip video CCTV** dari **titik pengamatan berbeda**:
+   - Masing-masing **≥10 menit**, mencakup periode lalu lintas **lengang dan padat**.
+   - **Bukan** dari sesi perekaman yang citranya dipakai sebagai data latih (cegah kebocoran).
+   - Rekam pada **resolusi & laju frame asli** kamera (keduanya dilaporkan — FPS memengaruhi pelacakan).
+   - Format terbaca OpenCV (mp4/H.264 aman).
+2. **Hitung manual oleh DUA penghitung terpisah** → `gt_<nama>.csv` (kerangka otomatis, lihat di bawah).
+   Bandingkan hasil per interval; interval yang berselisih ditinjau ulang bersama sampai sepakat;
+   **catat tingkat kesesuaian awal antar-penghitung** (dilaporkan di BAB 4).
+3. **Garis virtual** per klip: segmen lurus memotong seluruh lebar lajur, di area **bebas oklusi tetap**
+   (tiang/reklame), **tegak lurus** arah dominan; koordinat kedua ujung (piksel) **dicatat & dilaporkan**.
+4. **Ambang lulus RQ5** (keputusan pending **A-02/K5**) — target MAPE & FPS, bersama pembimbing.
+
+> **Tiga aturan kasus khusus (naskah 3.10.1) — untuk penghitung manual:** (a) titik acuan kendaraan =
+> **tengah sisi bawah** kotak pembatas saat melintas utuh; (b) kendaraan **berhenti** di garis tak dihitung
+> sampai perlintasan selesai (cegah hitung berulang saat macet); (c) kendaraan **berbalik arah** dihitung
+> sekali per arah perlintasan.
 
 ## Langkah kerja
 
