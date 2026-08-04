@@ -58,16 +58,17 @@ Karena STAL menyeimbangkan berdasarkan **ukuran saat memilih anchor**, sedangkan
 
 Rujukan primer YOLO26 (Sapkota et al., [7][8]) masih berupa **preprint arXiv yang belum melalui peninjauan sejawat** (*peer review*). Karena itu semua pernyataan tentang mekanisme internal YOLO26 — *dual-head NMS-free*, ProgLoss, STAL, MuSGD — harus ditulis dengan bahasa berhati-hati (Subbab 2.3.5, 2.9, dan 3.5): gunakan "dilaporkan", "menurut *preprint*", "diklaim penulis", bukan kalimat yang menganggapnya fakta mapan. Sikap ini juga melindungi klaim tesis: karena *baseline*-nya belum terverifikasi sejawat, verifikasi empiris terhadap kode nyata (yang justru dilakukan penelitian ini via instrumentasi *NMS-free*) menjadi kontribusi tersendiri.
 
-## Diskrepansi judul — WAJIB dikonfirmasi ke pembimbing
+## Judul final (RESOLVED 18 Jul 2026)
 
-Terdapat **dua versi judul yang berbeda** dan diskrepansi ini **belum boleh diselesaikan sendiri**. Catat keduanya apa adanya:
+Naufal memutuskan memakai **judul dokumen revisi pembimbing**:
 
-| Sumber | Judul | Penekanan |
-|---|---|---|
-| `CLAUDE.md` §1 (SSOT) | "MODIFIKASI DETEKTOR *NMS-FREE* YOLO26 DENGAN PEMBOBOTAN *LOSS* BERBASIS DENSITAS DAN PELACAKAN BYTETRACK UNTUK PENGHITUNGAN KENDARAAN *REAL-TIME* PADA LALU LINTAS HETEROGEN PADAT" | Menonjolkan "DETEKTOR *NMS-FREE*" + "PELACAKAN BYTETRACK"; **tidak** menaruh HAM/P2 di judul |
-| Dokumen fisik `TESIS_BAB1-3_REVISI_PEMBIMBING` | "MODIFIKASI ARSITEKTUR YOLO26 MELALUI ATENSI HIBRIDA, DETEKSI MULTI-SKALA P2, DAN PEMBOBOTAN *LOSS* BERBASIS DENSITAS UNTUK PENGHITUNGAN KENDARAAN *REAL-TIME* PADA LALU LINTAS HETEROGEN PADAT" | Menaruh "ATENSI HIBRIDA, DETEKSI MULTI-SKALA P2" di judul |
+> **MODIFIKASI ARSITEKTUR YOLO26 MELALUI ATENSI HIBRIDA, DETEKSI MULTI-SKALA P2, DAN PEMBOBOTAN *LOSS* BERBASIS DENSITAS UNTUK PENGHITUNGAN KENDARAAN *REAL-TIME* PADA LALU LINTAS HETEROGEN PADAT**
 
-Perbedaan ini bukan sekadar gaya: versi dokumen fisik menempatkan HAM dan P2 di judul, yang berpotensi menegangkan aturan "HAM/P2 = instrumen, bukan kebaruan" (judul biasanya mengangkat kontribusi utama). Versi SSOT justru menonjolkan *NMS-free* dan ByteTrack yang selaras dengan dua pilar. **JANGAN memilih, menggabungkan, atau menyelaraskan sendiri.** Tandai sebagai item konfirmasi ke Naufal dan Ibu Sandfreni, dan lacak di [keputusan pending](../status/pending-decisions.md). Diskrepansi terkait lain (jumlah sitasi 27 vs [1]–[30], sumber dataset Roboflow, lokasi "RTX 3060" tersisa) juga dicatat di sana — jangan menetapkan angka final tanpa persetujuan.
+Judul lama SSOT ("MODIFIKASI DETEKTOR *NMS-FREE* … DAN PELACAKAN BYTETRACK") **dipensiunkan**; `CLAUDE.md` §1 sudah disamakan.
+
+**Kritis — judul TIDAK mengubah framing kebaruan.** HAM dan P2 muncul di judul secara **deskriptif** (mendaftar komponen arsitektur yang dimodifikasi), **bukan** sebagai klaim kebaruan. Dua-pilar tetap utuh: DALW = kebaruan metode, analisis interaksi *NMS-free* = kebaruan analitis; HAM/P2 = instrumen (§12.2 aktif). Ini konsisten dengan badan dokumen sendiri: Subbab 3.6 menyatakan "Dua modifikasi pertama, yaitu Modul Atensi Hibrida dan Lapisan Deteksi P2, berperan sebagai **instrumen**", dan abstrak menegaskan DALW "melengkapi mekanisme bawaan YOLO26". Jadi saat menulis, **jangan** menyimpulkan dari judul bahwa HAM/P2 adalah kontribusi utama — kontribusi utama tetap DALW + analisis NMS-free.
+
+Diskrepansi terkait lain masih terbuka dan dilacak di [keputusan pending](../status/pending-decisions.md): jumlah sitasi kini **[1]–[30]** otoritatif (rekonsiliasi `.bib`), sumber dataset Roboflow, dan label GPU (dokumen "RTX 4060" → tambahkan "Ti"). Jangan menetapkan angka final tanpa persetujuan untuk yang masih terbuka.
 
 ## Rangkuman istilah wajib
 
