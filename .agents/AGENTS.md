@@ -22,7 +22,7 @@ Kode penelitian tesis S2 (Naufal Firdaus, NIM 20240804017, Magister Ilmu Kompute
 
 ## ✅ Judul final (RESOLVED 18 Jul 2026)
 
-Judul final = versi dokumen revisi pembimbing: **"MODIFIKASI ARSITEKTUR YOLO26 MELALUI ATENSI HIBRIDA, DETEKSI MULTI-SKALA P2, DAN PEMBOBOTAN *LOSS* BERBASIS DENSITAS UNTUK PENGHITUNGAN KENDARAAN *REAL-TIME* PADA LALU LINTAS HETEROGEN PADAT"** (`CLAUDE.md` §1 sudah disamakan). **Judul menyebut HAM/P2 secara DESKRIPTIF — framing kebaruan TIDAK berubah** (aturan #1 tetap: HAM/P2 = instrumen; DALW + analisis NMS-free = kebaruan). Detail: [framing](knowledge/thesis-framing.md), [keputusan pending](status/pending-decisions.md).
+Judul FINAL = naskah otoritatif `TESIS_BAB1-3_REVISI_SIDANG_v7`: **"MODIFIKASI DETEKTOR *NMS-FREE* YOLO26 DENGAN PEMBOBOTAN *LOSS* BERBASIS DENSITAS DAN PELACAKAN BYTETRACK UNTUK PENGHITUNGAN KENDARAAN *REAL-TIME* PADA LALU LINTAS HETEROGEN PADAT"** (`CLAUDE.md` §1 sudah disamakan). Judul transisi "MODIFIKASI ARSITEKTUR … ATENSI HIBRIDA, P2 …" **SUDAH DITOLAK** (mengaburkan instrumen vs kebaruan). **Framing kebaruan TIDAK berubah** (aturan #1 tetap: HAM/P2 = instrumen; DALW + analisis NMS-free = kebaruan). Detail: [framing](knowledge/thesis-framing.md), [keputusan pending](status/pending-decisions.md).
 
 ## Di mana mencari
 
