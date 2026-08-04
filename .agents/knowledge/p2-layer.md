@@ -8,7 +8,7 @@ Lapisan P2 adalah kepala deteksi tambahan pada *stride*-4 yang menghasilkan *fea
 
 Lapisan P2 dan HAM adalah *instrumen* rekayasa, bukan klaim kebaruan. YOLO26 sudah kuat sejak awal (dilengkapi *ProgLoss* dan STAL), sehingga setiap peningkatan yang melibatkan P2 selalu diframe sebagai perbaikan atas *baseline* yang sudah kuat, bukan sebagai temuan orisinal. Kebaruan tesis hanya dua pilar: (1) metodologis — Pembobotan *Loss* Berbasis Densitas (DALW), dan (2) analitis — penyelidikan interaksi *NMS-free*. Lihat [Framing kebaruan dua-pilar](thesis-framing.md); jangan pernah menempatkan P2 sebagai kontribusi orisinal di teks manapun. Detail komponen instrumen pendamping ada di [HAM](ham.md), sedangkan pilar metode ada di [DALW](dalw.md).
 
-⚠️ Diskrepansi judul terbuka (jangan diselesaikan sendiri): judul SSOT (CLAUDE.md §1) menonjolkan "DETEKTOR *NMS-FREE*" dan "PELACAKAN BYTETRACK" tanpa menyebut P2, sedangkan judul dokumen fisik pasca-revisi pembimbing memuat frasa "DETEKSI MULTI-SKALA P2" di judul. Ini harus dikonfirmasi ke Naufal + pembimbing — catat, jangan memilih. Ringkasan diskrepansi ada di [Keputusan pending & isu terbuka](../status/pending-decisions.md).
+✅ Judul final (RESOLVED 18 Jul 2026): judul memuat frasa "DETEKSI MULTI-SKALA P2" (versi dokumen revisi pembimbing). **Namun ini penyebutan DESKRIPTIF, bukan promosi P2 menjadi klaim kebaruan** — P2 tetap **instrumen** (§12.2). Dua-pilar utuh: DALW + analisis NMS-free = kebaruan. Detail: [framing](thesis-framing.md), [Keputusan pending](../status/pending-decisions.md).
 
 ## Sumber arsitektur: YAML resmi
 
