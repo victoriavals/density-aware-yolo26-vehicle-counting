@@ -85,14 +85,15 @@ Eksperimen mengikuti 10 prompt berurutan (adaptasi Windows-native). Ringkas per 
 
 Status penuh, tabel per-prompt, dan angka detail: [Progres eksperimen](status/progress.md). Keputusan yang menggantung: [Keputusan pending](status/pending-decisions.md).
 
-## Diskrepansi terbuka (jangan diselesaikan sendiri)
+## Diskrepansi (status)
 
-Beberapa item wajib dikonfirmasi ke Naufal + pembimbing dan **tidak boleh diputuskan agen**:
+- ✅ **Judul tesis — RESOLVED (18 Jul 2026):** dipakai judul dokumen revisi pembimbing ("MODIFIKASI ARSITEKTUR YOLO26 MELALUI ATENSI HIBRIDA, DETEKSI MULTI-SKALA P2, DAN PEMBOBOTAN *LOSS* BERBASIS DENSITAS…"). HAM/P2 di judul bersifat **deskriptif** — framing kebaruan tidak berubah (HAM/P2 tetap instrumen).
 
-- **Judul tesis berbeda** antara `CLAUDE.md` §1 (menekankan "DETEKTOR *NMS-FREE*" + "PELACAKAN BYTETRACK", tanpa HAM/P2 di judul) dan dokumen fisik `TESIS_BAB1-3_REVISI_PEMBIMBING` (menaruh "ATENSI HIBRIDA, DETEKSI MULTI-SKALA P2" di judul).
-- **Jumlah sitasi** (§9 menyebut 27; dokumen revisi memuat [1]–[30]).
+Sisa item terbuka, wajib dikonfirmasi ke Naufal + pembimbing dan **tidak boleh diputuskan agen**:
+
+- **Jumlah sitasi** — dokumen revisi [1]–[30] otoritatif (§9 sudah diperbarui ke 30); verifikasi `.bib` benar berisi 30 entri (catatan lama 27).
 - **Sumber dataset Roboflow** (workspace `sahabats-workspace/...-nkdvt` vs sitasi [17] `naufalfirdaus/...`).
-- **Label GPU** (masih ada lokasi bertuliskan "RTX 3060" yang wajib jadi "RTX 4060 Ti 8GB").
+- **Label GPU** — dokumen sudah "RTX 4060 8GB" di semua lokasi (3060 sudah diperbaiki), **tanpa "Ti"**; perangkat asli "RTX 4060 **Ti** 8GB" → tambahkan "Ti".
 
 Semua item ini dilacak di [TODO dokumen](status/document-todos.md) dan [Keputusan pending](status/pending-decisions.md).
 
