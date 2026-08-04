@@ -1,7 +1,8 @@
 # Kode Model Tesis — YOLO26 Termodifikasi (Tahap 1: Training & Ablasi)
 
-Implementasi BAB 3 tesis *"Modifikasi Arsitektur YOLO26 melalui Atensi Hibrida,
-Deteksi Multi-Skala P2, dan Pembobotan Loss Berbasis Densitas"*.
+Implementasi BAB 3 tesis *"Modifikasi Detektor NMS-Free YOLO26 dengan Pembobotan
+Loss Berbasis Densitas dan Pelacakan ByteTrack untuk Penghitungan Kendaraan
+Real-Time pada Lalu Lintas Heterogen Padat"*.
 Diverifikasi baris-per-baris terhadap **ultralytics 8.4.92** dan lulus uji
 `test_smoke.py` (matematika DALW, pembangunan 4 arsitektur, transfer bobot,
 loss end-to-end).
