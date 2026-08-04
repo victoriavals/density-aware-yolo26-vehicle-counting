@@ -5,12 +5,12 @@
 > **Basis pengetahuan diperluas (agent-facing).** Dokumen ini tetap SSOT ringkas. Untuk ekspansi navigable — arsitektur/injeksi kode, pengetahuan per-domain, aturan, status, dan playbook — lihat [`.agents/`](.agents/README.md), mulai dari [`.agents/AGENTS.md`](.agents/AGENTS.md). Skill operasional ada di [`.claude/skills/`](.claude/skills/). Bila `.agents/` berbeda dari kode/CLAUDE.md, **kode & CLAUDE.md menang**.
 
 ## 1. Identitas Tesis
-- **Judul (final — diputuskan Naufal 18 Jul 2026, mengikuti dokumen revisi pembimbing):** MODIFIKASI ARSITEKTUR YOLO26 MELALUI ATENSI HIBRIDA, DETEKSI MULTI-SKALA P2, DAN PEMBOBOTAN *LOSS* BERBASIS DENSITAS UNTUK PENGHITUNGAN KENDARAAN *REAL-TIME* PADA LALU LINTAS HETEROGEN PADAT
+- **Judul (FINAL — sesuai naskah otoritatif `TESIS_BAB1-3_REVISI_SIDANG_v7`, dikoreksi 18 Jul 2026):** MODIFIKASI DETEKTOR *NMS-FREE* YOLO26 DENGAN PEMBOBOTAN *LOSS* BERBASIS DENSITAS DAN PELACAKAN BYTETRACK UNTUK PENGHITUNGAN KENDARAAN *REAL-TIME* PADA LALU LINTAS HETEROGEN PADAT
 - **Penulis:** Naufal Firdaus — NIM 20240804017
 - **Program:** Magister Ilmu Komputer, Fakultas Ilmu Komputer, Universitas Esa Unggul
 - **Pembimbing:** Ibu Sandfreni — sandfreni@esaunggul.ac.id (bimbingan offline Sabtu di kampus)
-- ⚠️ **Judul menyebut HAM & P2 secara DESKRIPTIF, TIDAK mengubah framing kebaruan** — dua-pilar §3 tetap berlaku (HAM/P2 = instrumen, bukan klaim kebaruan; lihat §12.2). Ini keputusan sadar Naufal: judul mendaftar komponen yang dimodifikasi, sementara klaim kebaruan (DALW + analisis NMS-free) tetap di badan/abstrak. Judul lama "MODIFIKASI DETEKTOR *NMS-FREE* … DAN PELACAKAN BYTETRACK" DIPENSIUNKAN.
-- ⚠️ Verifikasi judul konsisten di halaman judul, ABSTRAK/ABSTRACT, dan seluruh bab; jangan pernah memakai frasa lama "berbasis ukuran objek".
+- ⚠️ **Judul menonjolkan DALW (kebaruan) + NMS-free/ByteTrack (paradigma & pipeline), BUKAN mendaftar HAM/P2** — framing dua-pilar §3 tetap berlaku (HAM/P2 = instrumen, bukan klaim kebaruan; lihat §12.2). Judul transisi "MODIFIKASI ARSITEKTUR YOLO26 MELALUI ATENSI HIBRIDA, DETEKSI MULTI-SKALA P2…" (sempat dicatat 18 Jul) **SUDAH DITOLAK** karena mendaftar ketiga komponen sehingga mengaburkan mana instrumen mana kebaruan. Naskah v4 **dan** v7 memakai judul NMS-free+ByteTrack di atas — itulah yang final.
+- ⚠️ Verifikasi judul konsisten di halaman judul, ABSTRAK/ABSTRACT, dan seluruh bab; jangan pernah memakai frasa lama "berbasis ukuran objek". Sisir juga sisa judul transisi (frasa "MELALUI ATENSI HIBRIDA, DETEKSI MULTI-SKALA P2") bila muncul di berkas mana pun.
 
 ## 2. Ringkasan Penelitian
 Lalu lintas heterogen padat (CCTV Jakarta) menyulitkan detektor standar karena tiga hal: dominasi objek kecil (roda dua 8–16 piksel pada citra 640), oklusi tinggi antarobjek, dan kepadatan ekstrem (>25 objek/frame). Tujuan umum: mengembangkan dan mengevaluasi modifikasi YOLO26 untuk sistem penghitungan kendaraan *real-time*.
