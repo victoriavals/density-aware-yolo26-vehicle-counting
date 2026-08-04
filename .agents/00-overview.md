@@ -87,7 +87,7 @@ Status penuh, tabel per-prompt, dan angka detail: [Progres eksperimen](status/pr
 
 ## Diskrepansi (status)
 
-- ✅ **Judul tesis — RESOLVED (18 Jul 2026):** dipakai judul dokumen revisi pembimbing ("MODIFIKASI ARSITEKTUR YOLO26 MELALUI ATENSI HIBRIDA, DETEKSI MULTI-SKALA P2, DAN PEMBOBOTAN *LOSS* BERBASIS DENSITAS…"). HAM/P2 di judul bersifat **deskriptif** — framing kebaruan tidak berubah (HAM/P2 tetap instrumen).
+- ✅ **Judul tesis — FINAL (dikoreksi 18 Jul 2026, sesuai `TESIS_BAB1-3_REVISI_SIDANG_v7`):** "MODIFIKASI DETEKTOR *NMS-FREE* YOLO26 DENGAN PEMBOBOTAN *LOSS* BERBASIS DENSITAS DAN PELACAKAN BYTETRACK…". Judul transisi "ARSITEKTUR … ATENSI HIBRIDA, P2 …" SUDAH DITOLAK. Framing kebaruan tidak berubah (HAM/P2 tetap instrumen).
 
 Sisa item terbuka, wajib dikonfirmasi ke Naufal + pembimbing dan **tidak boleh diputuskan agen**:
 
