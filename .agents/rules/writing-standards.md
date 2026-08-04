@@ -40,14 +40,9 @@ Larangan editorial yang menyertai penulisan: jangan mengisi atau mengubah placeh
 
 ## Item verifikasi terbuka (jangan diputus sendiri)
 
-Terdapat diskrepansi jumlah referensi yang **belum boleh diselesaikan sepihak** dan harus dikonfirmasi ke Naufal serta pembimbing sebelum finalisasi Daftar Pustaka:
+Jumlah referensi **otoritatif = [1]–[30]** (dokumen revisi pembimbing; `CLAUDE.md` §9 sudah diperbarui ke 30). Naskah bertumbuh dari 27 → 30 (a.l. RT-DETR [19], YOLO-World [20], YOLOE [21], survei atensi [22], SE-Net [23], Focal Loss [24], Ultralytics [28], supervision [29]). Urutan tetap = kemunculan pertama, semua ber-URL/DOI kecuali Wilcoxon 1945 [30] *paywalled* di JSTOR.
 
-| Sumber | Klaim jumlah sitasi |
-|---|---|
-| `CLAUDE.md` §9 (SSOT) | 27 referensi (`[1]`–`[27]`), urut kemunculan pertama, semua ber-URL/DOI (kecuali Wilcoxon 1945 *paywalled* di JSTOR) |
-| Dokumen fisik REVISI_PEMBIMBING | Daftar Pustaka memuat `[1]`–`[30]` |
-
-Selama diskrepansi ini terbuka, jangan menetapkan angka akhir jumlah sitasi maupun menomori ulang entri; tandai sebagai item verifikasi. Ketidaksesuaian serupa (judul tesis SSOT vs dokumen fisik, sumber *workspace* Roboflow, dan lokasi "RTX 3060" yang harus menjadi "RTX 4060 Ti 8GB") juga hanya di-*surface*, bukan diresolusi otomatis — lihat [Keputusan pending](../status/pending-decisions.md) dan [Document TODOs](../status/document-todos.md).
+**Sisa verifikasi (jangan menomori ulang tanpa cek):** pastikan `Daftar_Pustaka_Gabungan_BAB1-3.bib` benar berisi 30 entri (catatan lama menyebut 27) dan rekonsiliasikan bila masih 27. Diskrepansi lain — sumber *workspace* Roboflow, dan label GPU (dokumen "RTX 4060 8GB" → tambahkan "**Ti**") — hanya di-*surface*, bukan diresolusi otomatis. **Judul sudah RESOLVED** (versi revisi pembimbing). Lihat [Keputusan pending](../status/pending-decisions.md) dan [Document TODOs](../status/document-todos.md).
 
 ## Aturan terkait
 
