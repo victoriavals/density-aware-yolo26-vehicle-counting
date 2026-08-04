@@ -102,10 +102,9 @@ gradien — klaim Pers. 3.5 terpenuhi secara literal).
 
 ## Catatan konsistensi naskah (penting sebelum sidang)
 
-1. **GPU**: naskah menulis RTX 3060 8GB (Batasan 1.5, Tabel 3.6, subbab 2.5.2,
-   2.7.3, 3.6.2). Karena eksperimen akan berjalan di **RTX 4060**, perbarui
-   kelima titik tersebut (VRAM tetap 8GB, argumen "perangkat kelas menengah"
-   tetap berlaku).
+1. **GPU**: dokumen revisi pembimbing sudah menulis "RTX 4060 8GB" (3060 tuntas),
+   tetapi **tanpa "Ti"**. Perangkat asli **RTX 4060 Ti 8GB** → tambahkan "Ti" agar
+   seragam (VRAM tetap 8GB, argumen "perangkat kelas menengah" tetap berlaku).
 2. Nilai α, σ terpilih dari `dalw_best.json` → isi placeholder Tabel 3.3/BAB 4.
 3. `runs_tesis/*/results.csv` → sumber angka mAP placeholder BAB 4.
 
