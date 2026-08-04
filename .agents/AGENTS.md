@@ -18,11 +18,11 @@ Kode penelitian tesis S2 (Naufal Firdaus, NIM 20240804017, Magister Ilmu Kompute
 6. **Unit Wilcoxon = AP per (kelas × strata)**, 3 hipotesis utama + Holm; **MAPE hanya y>0**; **pejalan kaki dikecualikan** counting. [Statistik](knowledge/statistics.md), [Penghitungan](knowledge/counting.md).
 7. **Job panjang = background + log berstempel waktu + `--project` ABSOLUT**. [Logging & status](rules/logging-and-status.md).
 8. **Pertahankan bahasa kehati-hatian *preprint*** untuk klaim YOLO26.
-9. **Konfirmasi Naufal + pembimbing** sebelum keputusan besar (7 pending + judul). [Keputusan pending](status/pending-decisions.md).
+9. **Konfirmasi Naufal + pembimbing** sebelum keputusan besar (7 pending). [Keputusan pending](status/pending-decisions.md).
 
-## ⚠️ Diskrepansi judul (belum diselesaikan)
+## ✅ Judul final (RESOLVED 18 Jul 2026)
 
-Judul di dokumen fisik ("MODIFIKASI **ARSITEKTUR** YOLO26 **MELALUI ATENSI HIBRIDA, DETEKSI MULTI-SKALA P2**, …") **berbeda** dari judul SSOT `CLAUDE.md` §1 ("MODIFIKASI **DETEKTOR NMS-FREE** YOLO26 … **DAN PELACAKAN BYTETRACK** …"). Dokumen menaruh HAM/P2 di judul — bertegangan dengan aturan #1. **Keputusan Naufal + pembimbing**, bukan agen. Dilacak di [Keputusan pending](status/pending-decisions.md).
+Judul final = versi dokumen revisi pembimbing: **"MODIFIKASI ARSITEKTUR YOLO26 MELALUI ATENSI HIBRIDA, DETEKSI MULTI-SKALA P2, DAN PEMBOBOTAN *LOSS* BERBASIS DENSITAS UNTUK PENGHITUNGAN KENDARAAN *REAL-TIME* PADA LALU LINTAS HETEROGEN PADAT"** (`CLAUDE.md` §1 sudah disamakan). **Judul menyebut HAM/P2 secara DESKRIPTIF — framing kebaruan TIDAK berubah** (aturan #1 tetap: HAM/P2 = instrumen; DALW + analisis NMS-free = kebaruan). Detail: [framing](knowledge/thesis-framing.md), [keputusan pending](status/pending-decisions.md).
 
 ## Di mana mencari
 
