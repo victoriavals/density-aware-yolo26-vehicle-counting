@@ -18,13 +18,13 @@ Berkas sumber: `CLAUDE.md` §10.5 + §15.
 
 ## 2. Diskrepansi (status)
 
-### ✅ Judul tesis — RESOLVED (18 Jul 2026)
+### ✅ Judul tesis — FINAL (dikoreksi 18 Jul 2026)
 
-Naufal memutuskan memakai **judul dokumen revisi pembimbing**:
+Naskah otoritatif `TESIS_BAB1-3_REVISI_SIDANG_v7` (dan v4) memakai:
 
-> **MODIFIKASI ARSITEKTUR YOLO26 MELALUI ATENSI HIBRIDA, DETEKSI MULTI-SKALA P2, DAN PEMBOBOTAN *LOSS* BERBASIS DENSITAS UNTUK PENGHITUNGAN KENDARAAN *REAL-TIME* PADA LALU LINTAS HETEROGEN PADAT**
+> **MODIFIKASI DETEKTOR *NMS-FREE* YOLO26 DENGAN PEMBOBOTAN *LOSS* BERBASIS DENSITAS DAN PELACAKAN BYTETRACK UNTUK PENGHITUNGAN KENDARAAN *REAL-TIME* PADA LALU LINTAS HETEROGEN PADAT**
 
-Judul lama ("MODIFIKASI DETEKTOR NMS-FREE … DAN PELACAKAN BYTETRACK") **dipensiunkan**. **PENTING:** framing kebaruan **TIDAK berubah** — judul menyebut HAM & P2 secara **deskriptif** (mendaftar komponen yang dimodifikasi), tetapi keduanya **tetap instrumen, bukan klaim kebaruan** (aturan §12.2 utuh; dua-pilar §3 utuh; badan §3.6 dokumen sendiri menegaskan HAM/P2 "berperan sebagai instrumen"). Klaim kebaruan tetap: DALW (metode) + analisis NMS-free (analitis). `CLAUDE.md` §1 sudah disamakan ke judul ini.
+Judul transisi ("MODIFIKASI ARSITEKTUR … ATENSI HIBRIDA, DETEKSI MULTI-SKALA P2 …") yang sempat dicatat 18 Jul **SUDAH DITOLAK** (mendaftar ketiga komponen → mengaburkan instrumen vs kebaruan). **Bukan** keputusan pembimbing lagi — sudah final; jangan dibuka ulang. Framing kebaruan tetap: DALW (metode) + analisis NMS-free (analitis); HAM/P2 = instrumen (§12.2 utuh). `CLAUDE.md` §1 sudah disamakan.
 
 ### Diskrepansi terbuka tersisa (CATAT, jangan resolve sendiri)
 
