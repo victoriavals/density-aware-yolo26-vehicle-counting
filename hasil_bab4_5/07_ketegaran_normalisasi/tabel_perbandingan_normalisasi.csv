@@ -1,3 +1,3 @@
-run,epoch_tercatat,epoch_terbaik,mAP50_95_val_terbaik,status
-"V8 (default, bagi N objek)",99,49,0.64571,selesai (early-stop)
-V8_normw (bagi Sigma w_i),125,104,0.63452,"MASIH BERJALAN (epoch 125 tercatat, belum berhenti)"
+run,epoch_tercatat,epoch_terbaik,mAP50_95_val_terbaik,status,mAP50_95_TEST,mAP50_TEST,P_TEST,R_TEST
+"V8 (default, bagi N objek)",99,49,0.64571,selesai (early-stop),0.5375,0.7797,0.7806,0.6844
+V8_normw (bagi Sigma w_i),154,104,0.63452,selesai (early-stop),0.5362,0.7568,0.7508,0.6790
