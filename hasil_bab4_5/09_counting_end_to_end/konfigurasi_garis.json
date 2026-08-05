@@ -1,0 +1,78 @@
+{
+  "1_vidiouji": {
+    "berkas": "1_vidiouji.mp4",
+    "garis_piksel": [
+      504,
+      1,
+      1919,
+      839
+    ],
+    "panjang_garis_px": 1645,
+    "resolusi": "1920x1080",
+    "fps": 30.0,
+    "durasi_detik": 600.0,
+    "n_frame": 18000,
+    "n_interval": 10,
+    "interval_detik": 60,
+    "gt": "gt_1_vidiouji.csv",
+    "sumber_asli": "asli/1_vidiouji.mp4",
+    "catatan": "dipotong tepat 18.000 frame (600,0 dtk) dari rekaman asli, tanpa encode ulang"
+  },
+  "2_vidiouji": {
+    "berkas": "2_vidiouji.mp4",
+    "garis_piksel": [
+      119,
+      1,
+      1919,
+      926
+    ],
+    "panjang_garis_px": 2024,
+    "resolusi": "1920x1080",
+    "fps": 30.0,
+    "durasi_detik": 600.0,
+    "n_frame": 18000,
+    "n_interval": 10,
+    "interval_detik": 60,
+    "gt": "gt_2_vidiouji.csv",
+    "sumber_asli": "asli/2_vidiouji.mp4",
+    "catatan": "dipotong tepat 18.000 frame (600,0 dtk) dari rekaman asli, tanpa encode ulang"
+  },
+  "3_vidiouji": {
+    "berkas": "3_vidiouji.mp4",
+    "garis_piksel": [
+      0,
+      317,
+      1280,
+      668
+    ],
+    "panjang_garis_px": 1327,
+    "resolusi": "1280x720",
+    "fps": 30.0,
+    "durasi_detik": 600.0,
+    "n_frame": 18000,
+    "n_interval": 10,
+    "interval_detik": 60,
+    "gt": "gt_3_vidiouji.csv",
+    "sumber_asli": "asli/3_vidiouji.mp4",
+    "catatan": "dipotong tepat 18.000 frame (600,0 dtk) dari rekaman asli, tanpa encode ulang"
+  },
+  "4_vidiouji": {
+    "berkas": "4_vidiouji.mp4",
+    "garis_piksel": [
+      348,
+      739,
+      1919,
+      784
+    ],
+    "panjang_garis_px": 1572,
+    "resolusi": "1920x1080",
+    "fps": 30.0,
+    "durasi_detik": 600.0,
+    "n_frame": 18000,
+    "n_interval": 10,
+    "interval_detik": 60,
+    "gt": "gt_4_vidiouji.csv",
+    "sumber_asli": "asli/4_vidiouji.mp4",
+    "catatan": "dipotong tepat 18.000 frame (600,0 dtk) dari rekaman asli, tanpa encode ulang"
+  }
+}
