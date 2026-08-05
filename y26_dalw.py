@@ -39,11 +39,19 @@ from ultralytics.utils.tal import make_anchors
 # Parameter global DALW (diisi oleh apply_dalw / set_dalw_params)
 _ALPHA: float = 1.0
 _SIGMA: float = 0.10
+# Pemeriksaan ketegaran (naskah Subbab 3.6.3): bila True, loss dibagi JUMLAH BOBOT
+# (Σ w_i) alih-alih jumlah objek (Pers. 3.5). Bentuk ini mempertahankan skala loss
+# tetapi menghapus penguatan absolut pada citra padat, sehingga dipakai untuk
+# memastikan peningkatan performa tidak semata berasal dari perubahan skala loss.
+# Default False = bentuk yang dirumuskan naskah (pembagi jumlah objek).
+_NORM_BY_WEIGHT: bool = False
 
 
-def set_dalw_params(alpha: float, sigma: float) -> None:
-    global _ALPHA, _SIGMA
+def set_dalw_params(alpha: float, sigma: float, norm_by_weight: bool | None = None) -> None:
+    global _ALPHA, _SIGMA, _NORM_BY_WEIGHT
     _ALPHA, _SIGMA = float(alpha), float(sigma)
+    if norm_by_weight is not None:
+        _NORM_BY_WEIGHT = bool(norm_by_weight)
 
 
 def density_weights(
@@ -79,10 +87,12 @@ class DALWDetectionLoss(v8DetectionLoss):
     (utils/loss.py:400-463) dengan tiga modifikasi bertanda '# === DALW'.
     """
 
-    def __init__(self, model, tal_topk: int = 10, tal_topk2=None, alpha=None, sigma=None):
+    def __init__(self, model, tal_topk: int = 10, tal_topk2=None, alpha=None, sigma=None,
+                 norm_by_weight=None):
         super().__init__(model, tal_topk=tal_topk, tal_topk2=tal_topk2)
         self.dalw_alpha = _ALPHA if alpha is None else float(alpha)
         self.dalw_sigma = _SIGMA if sigma is None else float(sigma)
+        self.dalw_norm_by_weight = _NORM_BY_WEIGHT if norm_by_weight is None else bool(norm_by_weight)
 
     def get_assigned_targets_and_loss(self, preds, batch):
         loss = torch.zeros(3, device=self.device)  # box, cls, dfl
@@ -122,12 +132,17 @@ class DALWDetectionLoss(v8DetectionLoss):
             mask_gt,
         )
 
-        target_scores_sum = max(target_scores.sum(), 1)
-
         # === DALW (2/3): petakan w_gt ke tiap anchor foreground via target_gt_idx ===
         with torch.no_grad():
             w_anc = w_gt.gather(1, target_gt_idx.clamp(min=0))  # (bs, A)
             w_anc = torch.where(fg_mask.bool(), w_anc, torch.ones_like(w_anc))
+
+        # Pembagi normalisasi: bentuk naskah (Pers. 3.5) memakai jumlah objek
+        # sehingga skala loss ikut naik pada citra padat — penguatan yang dikehendaki.
+        # Varian ketegaran membagi dengan jumlah bobot sehingga skala loss tetap.
+        norm = ((target_scores * w_anc.unsqueeze(-1)).sum() if self.dalw_norm_by_weight
+                else target_scores.sum())
+        target_scores_sum = max(norm, 1)
 
         # Cls loss with optional class weighting
         bce_loss = self.bce(pred_scores, target_scores.to(dtype))  # (bs, A, nc)
@@ -162,15 +177,18 @@ class DALWDetectionLoss(v8DetectionLoss):
         )
 
 
-def apply_dalw(alpha: float, sigma: float) -> None:
+def apply_dalw(alpha: float, sigma: float, norm_by_weight: bool = False) -> None:
     """Aktifkan DALW untuk seluruh model yang dibangun SETELAH pemanggilan ini.
 
     Mem-patch DetectionModel.init_criterion agar E2ELoss dibangun dengan
     loss_fn=DALWDetectionLoss pada KEDUA cabang head (keputusan A-11).
     ProgLoss (jadwal gain o2m->o2o) dan STAL (assigner bawaan) tetap aktif.
     Panggil sekali per proses, SEBELUM model.train().
+
+    norm_by_weight=True mengaktifkan varian pemeriksaan ketegaran (pembagi Σw_i,
+    skala loss tetap); default False = bentuk naskah Pers. 3.5 (pembagi jumlah objek).
     """
-    set_dalw_params(alpha, sigma)
+    set_dalw_params(alpha, sigma, norm_by_weight)
     from ultralytics.nn import tasks
 
     def init_criterion(self):  # menggantikan tasks.DetectionModel.init_criterion
