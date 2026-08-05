@@ -1,0 +1,6 @@
+interval,class,direction,count
+0,big-vehicle,out,1
+0,car,in,2
+0,car,out,2
+0,two-wheeler,in,8
+0,two-wheeler,out,7
