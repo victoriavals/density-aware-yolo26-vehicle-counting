@@ -22,7 +22,8 @@ import cv2
 import numpy as np
 import torch
 
-from y26_stats import holm, run_wilcoxon_suite, wilcoxon_pair
+from y26_stats import (MIN_CELL_GT, bootstrap_map_ci, holm, run_wilcoxon_suite,
+                       wilcoxon_pair)
 from y26_strata import (DEN_EDGES, OCC_EDGES, _ap101, collect_cache, gt_attributes,
                         stratified_ap)
 from y26_counting import counting_metrics, run_counting
@@ -100,17 +101,55 @@ def e4_stats():
     x2 = x.copy(); x2[:3] = np.nan
     assert wilcoxon_pair(x2, y)["n"] == 27  # pasangan NaN dibuang
     assert wilcoxon_pair(y, y)["p"] == 1.0  # semua selisih nol
-    # suite: V8 unggul konsisten -> primer signifikan
-    rows_v1 = [dict(cls="c", dim="size", stratum=s, n_gt=10, ap50=0.5, ap5095=0.40 + 0.01 * i)
+    # suite: V8 unggul konsisten -> primer signifikan (n_gt >= 30 agar lolos sel minimum)
+    rows_v1 = [dict(cls="c", dim="size", stratum=s, n_gt=40, ap50=0.5, ap5095=0.40 + 0.01 * i)
                for i, s in enumerate(["small", "medium", "large"])]
     for extra_dim in ("occlusion", "density"):
-        rows_v1 += [dict(cls="c", dim=extra_dim, stratum=s, n_gt=10, ap50=0.5, ap5095=0.42)
+        rows_v1 += [dict(cls="c", dim=extra_dim, stratum=s, n_gt=40, ap50=0.5, ap5095=0.42)
                     for s in ("a", "b", "c")]
     rows_v8 = [dict(r, ap5095=r["ap5095"] + 0.05) for r in rows_v1]
     res = run_wilcoxon_suite({"V1": rows_v1, "V8": rows_v8})
     pri = [r for r in res if r["family"] == "primary"]
     assert len(pri) == 1 and pri[0]["signif_5pct"] and pri[0]["median_diff"] > 0
-    print(f"E4 Wilcoxon + Holm (konsisten scipy, suite utama/sekunder) ... {OK}")
+    assert pri[0]["n_sel_dibuang"] == 0 and pri[0]["min_n_gt"] == MIN_CELL_GT
+    # aturan ukuran sel minimum (Subbab 3.11.5): sel n_gt<30 dikeluarkan dari uji
+    kecil_v1 = rows_v1 + [dict(cls="c", dim="occlusion", stratum="heavy", n_gt=8,
+                               ap50=0.1, ap5095=0.05)]
+    kecil_v8 = rows_v8 + [dict(cls="c", dim="occlusion", stratum="heavy", n_gt=8,
+                               ap50=0.9, ap5095=0.90)]
+    r2 = [r for r in run_wilcoxon_suite({"V1": kecil_v1, "V8": kecil_v8})
+          if r["family"] == "primary"][0]
+    assert r2["n"] == pri[0]["n"], "sel n_gt<30 seharusnya tidak menambah unit uji"
+    assert r2["n_sel_dibuang"] == 1 and "heavy(n=8)" in r2["sel_dibuang"]
+    print(f"E4 Wilcoxon + Holm + aturan sel minimum n_gt<{MIN_CELL_GT} ... {OK}")
+
+
+def e8_bootstrap():
+    """Bootstrap CI tataran citra (Subbab 3.11.5) pada kasus yang diketahui jawabannya."""
+    def mc(tp_flags, T=10):
+        recs = [(np.array([0.9], np.float32), 1,
+                 np.full((T, 1), float(f), np.float32), np.zeros((T, 1), bool))
+                for f in tp_flags]
+        return dict(n_images=len(tp_flags), iou_thrs=[0.5 + 0.05 * t for t in range(T)],
+                    per_class=[recs])
+
+    sempurna = mc([1] * 24)
+    separuh = mc([1, 0] * 12)
+    # (a) varian identik -> selisih selalu nol, selang memuat nol
+    r = bootstrap_map_ci({"V8": sempurna, "V1": mc([1] * 24)},
+                         pairs=(("V8", "V1"),), n_boot=200, seed=0)[0]
+    assert abs(r["diff_point"]) < 1e-12 and r["ci_lo"] == 0.0 and r["ci_hi"] == 0.0
+    assert not r["selang_tanpa_nol"]
+    # (b) unggul konsisten -> selisih positif & selang tidak memuat nol
+    r2 = bootstrap_map_ci({"V8": sempurna, "V1": separuh},
+                          pairs=(("V8", "V1"),), n_boot=200, seed=0)[0]
+    assert r2["diff_point"] > 0.2 and r2["ci_lo"] > 0 and r2["selang_tanpa_nol"]
+    assert r2["frac_positif"] == 1.0 and r2["n_images"] == 24
+    # (c) determinisme untuk seed sama
+    r3 = bootstrap_map_ci({"V8": sempurna, "V1": separuh},
+                          pairs=(("V8", "V1"),), n_boot=200, seed=0)[0]
+    assert r3["ci_lo"] == r2["ci_lo"] and r3["ci_hi"] == r2["ci_hi"]
+    print(f"E8 bootstrap CI tataran citra (identik/unggul/deterministik) ... {OK}")
 
 
 def e5_count_metrics():
@@ -193,5 +232,6 @@ def e7_integration():
 
 
 if __name__ == "__main__":
-    e1_attrs(); e2_ap(); e3_ignore(); e4_stats(); e5_count_metrics(); e6_count_pipeline(); e7_integration()
+    e1_attrs(); e2_ap(); e3_ignore(); e4_stats(); e5_count_metrics(); e6_count_pipeline()
+    e7_integration(); e8_bootstrap()
     print("\nSemua uji Tahap 3 lulus — evaluasi terstratifikasi, Wilcoxon, dan counting siap.")
