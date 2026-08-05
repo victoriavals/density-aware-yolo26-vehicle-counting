@@ -26,8 +26,9 @@ from pathlib import Path
 import yaml
 
 from y26_modules import register_ham
-from y26_strata import collect_cache, load_cache, save_strata_csv, stratified_ap
-from y26_stats import run_wilcoxon_suite
+from y26_strata import (collect_cache, global_match_cache, load_cache, save_strata_csv,
+                        stratified_ap)
+from y26_stats import PRIMARY_PAIRS, bootstrap_map_ci, run_wilcoxon_suite
 
 
 def global_val(weights, data, split, batch, device):
@@ -55,6 +56,9 @@ def main():
     ap.add_argument("--device", default=None)
     ap.add_argument("--skip-global", action="store_true", help="lewati val ultralytics")
     ap.add_argument("--refresh-cache", action="store_true")
+    ap.add_argument("--n-boot", type=int, default=1000,
+                    help="jumlah pengambilan ulang bootstrap (Subbab 3.11.5); 0 = lewati")
+    ap.add_argument("--boot-seed", type=int, default=0)
     args = ap.parse_args()
 
     register_ham()
@@ -63,7 +67,8 @@ def main():
     variants = [f"V{i}" for i in range(1, 9)] if args.variants == "all" else args.variants.split(",")
     out = Path(args.out); out.mkdir(parents=True, exist_ok=True)
 
-    rows_by_variant, glob = {}, []
+    perlu_boot = {x for p in PRIMARY_PAIRS for x in p} if args.n_boot > 0 else set()
+    rows_by_variant, glob, match_caches = {}, [], {}
     for v in variants:
         w = Path(args.runs) / v / "weights" / "best.pt"
         if not w.exists():
@@ -79,6 +84,8 @@ def main():
                                     batch=args.batch, device=args.device, out_path=cpath))
         rows = stratified_ap(cache, names)
         rows_by_variant[v] = rows
+        if v in perlu_boot:
+            match_caches[v] = global_match_cache(cache, names)
         agg = {}
         for r in rows:
             if r["dim"] != "global" and r["n_gt"]:
@@ -101,7 +108,7 @@ def main():
             with open(f, "w", newline="") as fh:
                 cols = ["pair", "family", "metric", "n", "n_eff", "W", "p", "p_holm",
                         "median_diff", "mean_diff", "rank_biserial", "W_plus", "W_minus",
-                        "signif_5pct"]
+                        "signif_5pct", "min_n_gt", "n_sel_dibuang", "sel_dibuang"]
                 w = csv.DictWriter(fh, fieldnames=cols)
                 w.writeheader()
                 for r in res:
@@ -111,13 +118,36 @@ def main():
                 print("\n=== Wilcoxon (AP50-95, unit kelas×strata) ===")
                 for r in res:
                     if r["family"] == "primary":
-                        print(f"  [UTAMA] {r['pair']:>9}: W={r['W']:.1f} p={r['p']:.4g} "
+                        print(f"  [UTAMA] {r['pair']:>9}: n={r['n']} (buang {r['n_sel_dibuang']} sel "
+                              f"n_gt<{r['min_n_gt']}) W={r['W']:.1f} p={r['p']:.4g} "
                               f"median Δ={r['median_diff']:+.4f} r={r['rank_biserial']:+.3f} -> "
                               f"{'SIGNIFIKAN' if r['signif_5pct'] else 'tidak signifikan'} (5%)")
+                dibuang = next((r["sel_dibuang"] for r in res if r["family"] == "primary"), "")
+                if dibuang:
+                    print(f"  sel dikecualikan (deskriptif, Subbab 3.11.5): {dibuang}")
         (out / "wilcoxon_info.json").write_text(json.dumps(dict(
             unit="AP per (kelas x strata ukuran/oklusi/densitas), global dikecualikan",
             primary=["V8 vs V1", "V4 vs V1", "V8 vs V5"],
-            secondary="seluruh pasangan lain, koreksi Holm", alpha=0.05), indent=2))
+            secondary="seluruh pasangan lain, koreksi Holm", alpha=0.05,
+            min_n_gt=30, aturan_sel_minimum="Subbab 3.11.5: sel n_gt<30 dikecualikan dari uji, "
+                                           "dilaporkan deskriptif"), indent=2))
+
+    # ---------- selang kepercayaan bootstrap tataran citra (Subbab 3.11.5) ----------
+    if args.n_boot > 0 and len(match_caches) >= 2:
+        print(f"\n=== Bootstrap CI 95% selisih mAP50-95 ({args.n_boot} resample, tataran citra) ===")
+        boot = bootstrap_map_ci(match_caches, pairs=PRIMARY_PAIRS,
+                                n_boot=args.n_boot, seed=args.boot_seed)
+        if boot:
+            with open(out / "bootstrap_ci.csv", "w", newline="") as fh:
+                w = csv.DictWriter(fh, fieldnames=list(boot[0]))
+                w.writeheader()
+                for r in boot:
+                    w.writerow({k: (f"{x:.6g}" if isinstance(x, float) else x) for k, x in r.items()})
+            for r in boot:
+                print(f"  {r['pair']:>9}: Δ={r['diff_point']:+.4f} "
+                      f"CI95=[{r['ci_lo']:+.4f}, {r['ci_hi']:+.4f}] "
+                      f"P(Δ>0)={r['frac_positif']:.3f} -> "
+                      f"{'selang TIDAK memuat nol' if r['selang_tanpa_nol'] else 'selang memuat nol'}")
     print(f"\nSelesai. Hasil di {out}/")
 
 
