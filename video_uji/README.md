@@ -1,40 +1,51 @@
 # video_uji/ — Video Uji Counting (P9 / RQ5)
 
-## ✅ Status: keempat klip siap, tinggal hitung manual
+## ✅ Status: counting SELESAI untuk 3 klip (hasil di `hasil_bab4_5/09_counting_end_to_end/`)
 
 Berkas kerja sudah **dipotong tepat 600,0 detik (18.000 frame)** dengan `ffmpeg -frames:v 18000 -c copy`
 (tanpa encode ulang) agar setiap jendela pengamatan berdurasi sama. Rekaman penuh diarsipkan di `asli/`.
 
-| Klip | Garis virtual | Resolusi | FPS | Interval |
+**Konvensi arah:** `in` = kendaraan menuju **kiri-bawah** bingkai (definisi penghitung manual).
+Diwujudkan dengan **membalik urutan titik** garis pada `--line` — geometri garis identik,
+hanya arah pembacaan `sv.LineZone` yang berubah. Rincian & bukti: `konfigurasi_garis.json`.
+
+| Klip | Garis dipakai (`--line`) | Resolusi | Interval | Status |
 |---|---|---|---|---|
-| `1_vidiouji.mp4` | `504,1,1919,839` | 1920×1080 | 30 | 10 |
-| `2_vidiouji.mp4` | `119,1,1919,926` | 1920×1080 | 30 | 10 |
-| `3_vidiouji.mp4` | `0,317,1280,668` | 1280×720 | 30 | 10 |
-| `4_vidiouji.mp4` | `348,739,1919,784` | 1920×1080 | 30 | 10 |
+| `2_vidiouji.mp4` | `1919,926,119,1` | 1920×1080 | 10 | ✅ dipakai |
+| `3_vidiouji.mp4` | `1280,668,0,317` | 1280×720 | 10 | ✅ dipakai |
+| `4_vidiouji.mp4` | `1919,784,348,739` | 1920×1080 | 10 | ✅ dipakai |
+| `1_vidiouji.mp4` | ~~`504,1,1919,839`~~ | 1920×1080 | 10 | ⛔ **DIKECUALIKAN** |
+
+> **Kenapa klip 1 dikecualikan (keputusan peneliti, 5 Agu 2026):** segmen garisnya berakhir
+> pada y=839 sehingga tidak menjangkau lajur bawah yang dipakai mobil — hitung manual
+> (lebar jalan penuh, 20 mobil/10 mnt) dan keluaran sistem (0 mobil) mengukur populasi
+> kendaraan yang berbeda. Ini **cacat validitas pengukuran**, bukan performa model. Berkas
+> mentahnya **tetap disimpan** sebagai bukti; alasan pengecualian wajib ditulis di BAB 4/5.
+> Bukti diagnosis: `preview/DIAG_klip1_mobil.jpg`, `counting_out/1_vidiouji/`.
 
 Rincian lengkap (untuk dilaporkan di BAB 4 sesuai §3.10.1): `konfigurasi_garis.json`.
 Pratinjau garis: `preview/FINAL_*.jpg` · alat pemilih garis: `preview/pilih_garis.html`.
 
-**Yang tersisa:** isi `gt_*.csv` (60 baris tiap klip = 10 interval × 3 kelas × 2 arah) oleh **dua penghitung terpisah**.
+**Hasil counting** (3 klip, 180 pengamatan): MAE 1,972 · RMSE 4,947 · MAPE 37,17 % ·
+FPS pipeline 20,47. Rincian: `../hasil_bab4_5/09_counting_end_to_end/`.
 
-Alur hitung manual:
-1. Salin template jadi dua: `gt_1_vidiouji_A.csv` (penghitung 1) dan `gt_1_vidiouji_B.csv` (penghitung 2).
-   Masing-masing mengisi **tanpa melihat hasil yang lain**.
-2. Bandingkan + hitung tingkat kesesuaian awal (wajib dilaporkan di BAB 4):
-   ```bash
-   python bandingkan_gt.py --dir video_uji
-   ```
-   Menghasilkan `<klip>_perbedaan.csv` berisi baris yang berselisih.
-3. Tinjau baris yang berselisih **bersama-sama**, sepakati angkanya, simpan sebagai
-   `gt_<klip>.csv` (tanpa akhiran `_A`/`_B`) — inilah GT final yang dipakai `y26_counting.py`.
-
-Perintah counting (dijalankan Claude setelah GT terisi):
+Perintah yang dipakai (contoh klip 3):
 ```bash
-python y26_counting.py --video video_uji/1_vidiouji.mp4 --weights runs_tesis/V8/weights/best.pt \
-    --line 504,1,1919,839 --interval-s 60 --gt video_uji/gt_1_vidiouji.csv --save-video
+python y26_counting.py --video video_uji/3_vidiouji.mp4 --weights runs_tesis/V8/weights/best.pt \
+    --line 1280,668,0,317 --interval-s 60 --gt video_uji/gt_3_vidiouji.csv
 ```
 
+### ⏳ Yang masih terbuka
+
+1. **Penghitung kedua** (protokol 3.10.1 menuntut dua penghitung independen + pelaporan
+   tingkat kesesuaian awal — keputusan **K7**). GT saat ini dari satu penghitung.
+   Bila penghitung kedua tersedia: salin `gt_<klip>.csv` → `gt_<klip>_A.csv` dan `_B.csv`,
+   isi terpisah, lalu jalankan `python bandingkan_gt.py --dir video_uji`.
+2. **Ambang lulus RQ5** (**A-02/K5**) — target MAPE & FPS dari pembimbing.
+
 ---
+
+## Referensi: cara menyiapkan klip baru (bila diperlukan)
 
 
 Folder ini menampung klip CCTV uji untuk evaluasi penghitungan end-to-end
