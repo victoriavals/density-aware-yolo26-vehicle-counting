@@ -6,5 +6,7 @@
     "V8 vs V5"
   ],
   "secondary": "seluruh pasangan lain, koreksi Holm",
-  "alpha": 0.05
+  "alpha": 0.05,
+  "min_n_gt": 30,
+  "aturan_sel_minimum": "Subbab 3.11.5: sel n_gt<30 dikecualikan dari uji, dilaporkan deskriptif"
 }
