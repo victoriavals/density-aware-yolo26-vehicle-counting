@@ -13,3 +13,4 @@ runs_tesis/
 inits/
 cfg/
 *.pt
+.queue_ketegaran.sh
