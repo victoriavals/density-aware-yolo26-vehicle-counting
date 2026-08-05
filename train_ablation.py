@@ -38,7 +38,8 @@ def train_once(args, variant: str, run_name: str, epochs: int, alpha: float, sig
 
     cfg = VARIANTS[variant]
     if cfg["dalw"]:
-        apply_dalw(alpha, sigma)  # patch loss SEBELUM trainer membangun model
+        # patch loss SEBELUM trainer membangun model
+        apply_dalw(alpha, sigma, norm_by_weight=getattr(args, "dalw_norm_by_weight", False))
 
     last = Path(args.project) / run_name / "weights" / "last.pt"
     if args.resume and last.exists():
@@ -137,6 +138,9 @@ def main():
                     help="jumlah citra probe NMS-free per epoch (0 = nonaktif)")
     ap.add_argument("--suffix", default="",
                     help="akhiran nama run, mis. _a0.5 untuk sensitivitas alpha (BAB 4)")
+    ap.add_argument("--dalw-norm-by-weight", action="store_true",
+                    help="pemeriksaan ketegaran: bagi loss dengan jumlah bobot (Sigma w_i) "
+                         "alih-alih jumlah objek (Pers. 3.5) — skala loss tetap")
     ap.add_argument("--project", default="runs_tesis")
     ap.add_argument("--workdir", default=".")
     ap.add_argument("--resume", action="store_true")
