@@ -91,6 +91,28 @@ def render_crop(img: Image.Image, boxes_px: list, idx: int, dst: Path, min_sisi:
     crop.save(dst, quality=92)
 
 
+def urut_seimbang(manifest: list[dict]) -> list[dict]:
+    """Urutkan antrean anotasi BERGANTIAN antar tier proksi.
+
+    Tanpa ini, prefiks antrean didominasi tier 'no' (pool 'no' jauh lebih besar
+    sehingga kunci md5 objek terpilihnya lebih rendah): 100 pertama = 82 no /
+    18 partial. Karena anotator boleh berhenti sebelum 200, setiap prefiks
+    antrean harus seimbang agar matriks kesesuaian tetap bermakna. Tier proksi
+    TIDAK ditampilkan ke anotator, jadi penilaian tetap blind.
+    """
+    per_tier: dict[str, list[dict]] = {}
+    for r in sorted(manifest, key=lambda x: int(x["sample_id"])):
+        per_tier.setdefault(r["proxy_tier"], []).append(r)
+    urut, kursor = [], {t: 0 for t in per_tier}
+    while len(urut) < sum(len(v) for v in per_tier.values()):
+        for t in OCC_NAMES:  # urutan tier tetap -> deterministik
+            pool = per_tier.get(t, [])
+            if kursor.get(t, 0) < len(pool):
+                urut.append(pool[kursor[t]])
+                kursor[t] += 1
+    return urut
+
+
 def buat_html(items: list[dict], out: Path) -> None:
     data = json.dumps(items, ensure_ascii=False)
     html = """<!DOCTYPE html>
@@ -154,7 +176,25 @@ def main() -> None:
     ap.add_argument("--per-image-cap", type=int, default=4, help="maks objek per citra per tier")
     ap.add_argument("--min-sisi", type=int, default=320, help="sisi terpendek minimum crop (px)")
     ap.add_argument("--out", default="anotasi_oklusi")
+    ap.add_argument("--rebuild-html", action="store_true",
+                    help="bangun ulang anotasi.html (antrean seimbang) dari manifest; "
+                         "crop & pemetaan sample_id TIDAK disentuh")
     a = ap.parse_args()
+
+    out_dir = Path(a.out)
+    if a.rebuild_html:
+        mf = list(csv.DictReader(open(out_dir / "sample_manifest.csv", encoding="utf-8")))
+        urut = urut_seimbang(mf)
+        items = [dict(sid=int(r["sample_id"]), f=r["berkas_crop"], img=r["image"],
+                      gi=int(r["gt_index"]), c=r["kelas"]) for r in urut]
+        buat_html(items, out_dir / "anotasi.html")
+        for lim in (50, 100, len(items)):
+            sub = urut[:lim]
+            dist = {t: sum(1 for r in sub if r["proxy_tier"] == t) for t in OCC_NAMES}
+            print(f"  {lim} pertama -> tier proksi: { {k: v for k, v in dist.items() if v} }")
+        print(f"{out_dir / 'anotasi.html'} dibangun ulang ({len(items)} objek, antrean seimbang); "
+              f"crop & sample_id tidak berubah")
+        return
 
     cfg = yaml.safe_load(Path(a.data).read_text())
     root = Path(cfg.get("path", Path(a.data).parent))
