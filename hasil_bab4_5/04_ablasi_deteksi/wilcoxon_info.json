@@ -1,0 +1,12 @@
+{
+  "unit": "AP per (kelas x strata ukuran/oklusi/densitas), global dikecualikan",
+  "primary": [
+    "V8 vs V1",
+    "V4 vs V1",
+    "V8 vs V5"
+  ],
+  "secondary": "seluruh pasangan lain, koreksi Holm",
+  "alpha": 0.05,
+  "min_n_gt": 30,
+  "aturan_sel_minimum": "Subbab 3.11.5: sel n_gt<30 dikecualikan dari uji, dilaporkan deskriptif"
+}
