@@ -417,6 +417,143 @@ def bab_08_oklusi():
     return r
 
 
+# ======================================================================
+# 09 — COUNTING END-TO-END (RQ5)
+# ======================================================================
+KLIP_COUNTING = ("2_vidiouji", "3_vidiouji", "4_vidiouji")
+# 1_vidiouji DIKECUALIKAN (keputusan Naufal 5 Agu 2026): segmen garis virtualnya tidak
+# menjangkau lajur yang dipakai mobil, sehingga hitung manual (lebar jalan penuh) dan
+# keluaran sistem mengukur populasi kendaraan yang berbeda -> cacat validitas pengukuran,
+# BUKAN performa buruk. Berkas mentahnya tetap disimpan sebagai bukti; alasan pengecualian
+# wajib dinyatakan eksplisit di BAB 4/5.
+
+
+def bab_09_counting(klip=KLIP_COUNTING):
+    """Rangkum hasil counting yang TERSEDIA; klip tanpa hasil dilewati (jujur)."""
+    d = OUT / "09_counting_end_to_end"
+    KELAS = ("big-vehicle", "car", "two-wheeler")
+    ringkas, banding = [], []
+    for stem in klip:
+        sj = ROOT / f"counting_out/{stem}/summary.json"
+        gtf = ROOT / f"video_uji/gt_{stem}.csv"
+        if not sj.exists():
+            print(f"  [lewati] {stem}: belum ada hasil counting")
+            continue
+        s = json.loads(sj.read_text())
+        m = s.get("metrics", {})
+        sys_tot = {}
+        for k, v in s.get("totals", {}).items():
+            kls, arah = k.rsplit("_", 1)
+            sys_tot[(kls, arah)] = v
+        gt_tot = {}
+        if gtf.exists():
+            for r in csv.DictReader(open(gtf, encoding="utf-8")):
+                key = (r["class"], r["direction"])
+                gt_tot[key] = gt_tot.get(key, 0) + int(r["count"])
+        ringkas.append(dict(
+            klip=stem, garis=",".join(map(str, s["line"])), frame=s["frames"],
+            MAE=round(m.get("MAE", float("nan")), 4), RMSE=round(m.get("RMSE", float("nan")), 4),
+            MAPE_persen=round(m.get("MAPE", float("nan")), 2),
+            n_pengamatan=m.get("T", 0), n_dikecualikan_y0=m.get("mape_excluded", 0),
+            total_sistem=sum(sys_tot.values()), total_manual=sum(gt_tot.values()),
+            selisih_agregat_persen=round((sum(sys_tot.values()) - sum(gt_tot.values()))
+                                         / max(sum(gt_tot.values()), 1) * 100, 1),
+            fps_pipeline=round(s["fps_pipeline"], 2), fps_model=round(s["fps_model"], 2)))
+        for kls in KELAS:
+            for arah in ("in", "out"):
+                banding.append(dict(klip=stem, kelas=kls, arah=arah,
+                                    sistem=sys_tot.get((kls, arah), 0),
+                                    manual=gt_tot.get((kls, arah), 0)))
+    if not ringkas:
+        print("  [09] belum ada hasil counting sama sekali")
+        return []
+
+    with open(d / "ringkasan_counting_per_klip.csv", "w", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=list(ringkas[0])); w.writeheader(); w.writerows(ringkas)
+    with open(d / "perbandingan_sistem_vs_manual.csv", "w", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=list(banding[0])); w.writeheader(); w.writerows(banding)
+
+    # grafik 1: sistem vs manual per kelas/arah, per klip
+    n = len(ringkas)
+    fig, axes = plt.subplots(1, n, figsize=(5.2 * n, 4.4), squeeze=False)
+    for ax, r in zip(axes[0], ringkas):
+        sub = [b for b in banding if b["klip"] == r["klip"]]
+        lbl = [f"{b['kelas'].split('-')[0]}\n{b['arah']}" for b in sub]
+        x = np.arange(len(sub)); w = 0.38
+        ax.bar(x - w / 2, [b["manual"] for b in sub], w, label="manual (GT)", color="#4C72B0")
+        ax.bar(x + w / 2, [b["sistem"] for b in sub], w, label="sistem", color="#DD8452")
+        ax.set_xticks(x, lbl, fontsize=7)
+        ax.set_title(f"{r['klip']}\nMAE={r['MAE']:.2f} MAPE={r['MAPE_persen']:.1f}%", fontsize=10)
+        ax.set_ylabel("jumlah perlintasan (10 menit)")
+        ax.legend(fontsize=8)
+    fig.suptitle("Penghitungan end-to-end: sistem vs hitung manual "
+                 "(arah diselaraskan; klip 1 dikecualikan)")
+    fig.tight_layout()
+    simpan(fig, d / "grafik_sistem_vs_manual.png")
+
+    # grafik 2: galat per interval (sebar)
+    fig, ax = plt.subplots(figsize=(6.2, 5.6))
+    warna_klip = {"1_vidiouji": "#4C72B0", "2_vidiouji": "#55A868",
+                  "3_vidiouji": "#C44E52", "4_vidiouji": "#8172B2"}
+    maks = 1
+    for r in ringkas:
+        f = ROOT / f"counting_out/{r['klip']}/counting_errors.csv"
+        if not f.exists():
+            continue
+        rows = list(csv.DictReader(open(f, encoding="utf-8")))
+        ys = [int(x["y"]) for x in rows]; yh = [int(x["yhat"]) for x in rows]
+        maks = max(maks, max(ys + yh + [1]))
+        ax.scatter(ys, yh, s=32, alpha=.65, label=r["klip"], color=warna_klip.get(r["klip"], "#888"))
+    ax.plot([0, maks], [0, maks], "k--", lw=1, label="ideal (sistem = manual)")
+    ax.set_xlabel("hitung manual per interval (y)"); ax.set_ylabel("hitung sistem per interval (yhat)")
+    ax.set_title("Sebar hitungan per interval x kelas x arah\ntitik di bawah garis = sistem kurang hitung")
+    ax.legend(fontsize=8); fig.tight_layout()
+    simpan(fig, d / "grafik_sebar_per_interval.png")
+
+    for r in ringkas:
+        for f in ("counts_per_interval.csv", "counting_errors.csv", "summary.json"):
+            src = ROOT / f"counting_out/{r['klip']}/{f}"
+            if src.exists():
+                shutil.copy(src, d / f"{r['klip']}_{f}")
+
+    # ---- metrik GABUNGAN: dihitung dari kumpulan pengamatan, bukan rata-rata dari rata-rata
+    y, yh = [], []
+    for r in ringkas:
+        f = ROOT / f"counting_out/{r['klip']}/counting_errors.csv"
+        if not f.exists():
+            continue
+        for row in csv.DictReader(open(f, encoding="utf-8")):
+            y.append(int(row["y"])); yh.append(int(row["yhat"]))
+    if y:
+        y = np.array(y, float); yh = np.array(yh, float)
+        err = y - yh
+        pos = y > 0
+        gab = dict(
+            n_klip=len(ringkas), n_pengamatan=len(y),
+            MAE=round(float(np.mean(np.abs(err))), 4),
+            RMSE=round(float(np.sqrt(np.mean(err ** 2))), 4),
+            MAPE_persen=round(float(100 * np.mean(np.abs(err[pos]) / y[pos])), 2),
+            n_dikecualikan_y0=int((~pos).sum()),
+            frac_dikecualikan=round(float((~pos).mean()), 4),
+            total_manual=int(y.sum()), total_sistem=int(yh.sum()),
+            selisih_agregat_persen=round(float((yh.sum() - y.sum()) / max(y.sum(), 1) * 100), 1),
+            fps_pipeline_rata2=round(float(np.mean([r["fps_pipeline"] for r in ringkas])), 2),
+            fps_pipeline_min=min(r["fps_pipeline"] for r in ringkas),
+            fps_pipeline_maks=max(r["fps_pipeline"] for r in ringkas),
+            klip_dipakai="; ".join(r["klip"] for r in ringkas),
+            klip_dikecualikan="1_vidiouji (segmen garis tak menjangkau lajur mobil)")
+        with open(d / "metrik_GABUNGAN.csv", "w", newline="", encoding="utf-8") as fh:
+            w = csv.DictWriter(fh, fieldnames=list(gab)); w.writeheader(); w.writerow(gab)
+        print(f"  GABUNGAN {gab['n_klip']} klip, {gab['n_pengamatan']} pengamatan: "
+              f"MAE={gab['MAE']} RMSE={gab['RMSE']} MAPE={gab['MAPE_persen']}% "
+              f"(y=0 dikecualikan {gab['n_dikecualikan_y0']}), "
+              f"agregat {gab['selisih_agregat_persen']:+}%, FPS {gab['fps_pipeline_rata2']}")
+        ringkas.append({"klip": "GABUNGAN", **{k: v for k, v in gab.items() if k in
+                        ("MAE", "RMSE", "MAPE_persen", "n_pengamatan", "n_dikecualikan_y0",
+                         "total_sistem", "total_manual", "selisih_agregat_persen")}})
+    return ringkas
+
+
 if __name__ == "__main__":
     print("01 dataset..."); bab_01_dataset()
     print("02 grid search..."); bab_02_grid()
