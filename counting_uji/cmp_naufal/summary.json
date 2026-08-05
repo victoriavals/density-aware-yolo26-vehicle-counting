@@ -1,0 +1,18 @@
+{
+  "video": "video_uji/1_vidiouji.mp4",
+  "frames": 1800,
+  "fps_video": 30.0,
+  "fps_model": 21.062400513790248,
+  "fps_pipeline": 18.489099086644657,
+  "line": [
+    504,
+    1,
+    1919,
+    839
+  ],
+  "interval_s": 60,
+  "totals": {
+    "two-wheeler_in": 14,
+    "two-wheeler_out": 11
+  }
+}
