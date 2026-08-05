@@ -1,0 +1,4 @@
+split,n_citra,big-vehicle,car,pedestrian,two-wheeler
+train,2372,1916,3971,5207,5692
+valid,679,397,839,1640,1218
+test,338,332,765,638,865
