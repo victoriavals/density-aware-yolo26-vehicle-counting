@@ -1,0 +1,21 @@
+{
+  "agreement": 0.68,
+  "n": 200,
+  "confusion": {
+    "no": {
+      "no": 74,
+      "partial": 24,
+      "heavy": 0
+    },
+    "partial": {
+      "no": 23,
+      "partial": 62,
+      "heavy": 0
+    },
+    "heavy": {
+      "no": 3,
+      "partial": 14,
+      "heavy": 0
+    }
+  }
+}
