@@ -7,8 +7,10 @@ ruang deteksi:
 
   Ukuran   : luas kotak, konvensi MS COCO — small < 32², medium < 96², large.
   Oklusi   : proksi Pers. 3.1, o_i = max_{j≠i} IoU(b_i, b_j);
-             tier default no < 0,10 ≤ partial < 0,35 ≤ heavy (keputusan
-             implementasi — laporkan ambangnya di BAB 3/4).
+             tier no < 0,10 ≤ partial ≤ 0,40 < heavy sesuai naskah v7 Tabel 3.6.
+             (Validasi manual P8 menunjukkan proksi meremehkan oklusi perseptual:
+             kesesuaian 68,0 %, dan tier heavy praktis tak pernah terbentuk —
+             lihat hasil/validasi_oklusi.md; wajib dilaporkan di BAB 4.)
   Densitas : jumlah objek per citra; default sparse < 10 ≤ medium < 26 ≤ dense
              (selaras narasi BAB 1 "lebih dari 25 objek per frame").
 
@@ -34,7 +36,7 @@ from y26_modules import register_ham
 from y26_nmsfree import _letterbox, split_image_paths
 
 SIZE_EDGES = (32.0**2, 96.0**2)
-OCC_EDGES = (0.10, 0.35)
+OCC_EDGES = (0.10, 0.40)  # naskah v7 Tabel 3.6: no <0,10 | partial 0,10–0,40 | heavy >0,40
 DEN_EDGES = (10, 26)
 SIZE_NAMES = ("small", "medium", "large")
 OCC_NAMES = ("no", "partial", "heavy")
@@ -235,6 +237,74 @@ def stratified_ap(cache, class_names, iou_thrs=IOU_THRS,
             rows.append(dict(cls=cname, dim=dim, stratum=nm, n_gt=n_pos,
                              ap50=float(aps[0]), ap5095=float(np.nanmean(aps)) if n_pos else float("nan")))
     return rows
+
+
+def global_match_cache(cache, class_names, iou_thrs=IOU_THRS):
+    """Pencocokan prediksi–GT per (citra × kelas) pada strata global.
+
+    Bahan uji bootstrap TATARAN CITRA (Subbab 3.11.5): hasil pencocokan disimpan
+    per citra sehingga seribu pengambilan ulang hanya perlu menyusun ulang
+    potongan per citra, tanpa inferensi atau pencocokan berulang.
+
+    Return dict(n_images, iou_thrs, per_class) dengan
+    per_class[c][i] = (conf[D], n_pos, tp[T, D], ig[T, D]) atau None bila kosong.
+    """
+    pred, gt, n_img = cache["pred"], cache["gt"], cache["n_images"]
+    p_img, p_cls = pred[:, 0].astype(int), pred[:, 6].astype(int)
+    g_img, g_cls = gt[:, 0].astype(int), gt[:, 5].astype(int)
+    from ultralytics.utils.metrics import box_iou
+
+    thrs = [float(t) for t in iou_thrs]
+    per_class: list[list] = [[None] * n_img for _ in class_names]
+    for i in range(n_img):
+        for c in range(len(class_names)):
+            di = np.where((p_img == i) & (p_cls == c))[0]
+            gi = np.where((g_img == i) & (g_cls == c))[0]
+            if len(di) == 0 and len(gi) == 0:
+                continue
+            n_pos = int(len(gi))
+            if len(di) == 0:
+                per_class[c][i] = (np.zeros(0, np.float32), n_pos,
+                                   np.zeros((len(thrs), 0), np.float32),
+                                   np.zeros((len(thrs), 0), bool))
+                continue
+            iou = (box_iou(torch.from_numpy(gt[gi, 1:5]), torch.from_numpy(pred[di, 1:5])).T.numpy()
+                   if len(gi) else np.zeros((len(di), 0), np.float32))
+            order = np.argsort(-pred[di, 5])
+            gt_ig = np.zeros(len(gi), bool)  # strata global: tak ada GT yang di-ignore
+            tps, igs = [], []
+            for thr in thrs:
+                tp, ig = _match_image(iou, order, gt_ig, thr, None)
+                tps.append(tp); igs.append(ig)
+            per_class[c][i] = (pred[di, 5].astype(np.float32), n_pos,
+                               np.stack(tps), np.stack(igs))
+    return dict(n_images=n_img, iou_thrs=thrs, per_class=per_class)
+
+
+def map_from_sample(mc: dict, img_idx) -> float:
+    """mAP@0,5:0,95 pada himpunan citra tertentu (indeks boleh berulang — bootstrap)."""
+    aps = []
+    T = len(mc["iou_thrs"])
+    for recs in mc["per_class"]:
+        confs, tps, igs, n_pos = [], [], [], 0
+        for i in img_idx:
+            rec = recs[i]
+            if rec is None:
+                continue
+            conf, npos_i, tp, ig = rec
+            n_pos += npos_i
+            if len(conf):
+                confs.append(conf); tps.append(tp); igs.append(ig)
+        if n_pos == 0:
+            continue  # kelas tanpa GT pada resample ini -> tak menyumbang mAP
+        if confs:
+            conf = np.concatenate(confs)
+            tp = np.concatenate(tps, axis=1)
+            ig = np.concatenate(igs, axis=1)
+            aps.append(float(np.nanmean([_ap101(conf, tp[t], ig[t], n_pos) for t in range(T)])))
+        else:
+            aps.append(0.0)  # ada GT tetapi tak ada prediksi -> AP nol
+    return float(np.nanmean(aps)) if aps else float("nan")
 
 
 def save_strata_csv(rows_by_variant: dict[str, list[dict]], out_csv: str):
