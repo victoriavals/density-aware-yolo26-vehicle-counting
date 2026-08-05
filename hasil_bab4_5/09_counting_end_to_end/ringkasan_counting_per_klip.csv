@@ -1,0 +1,4 @@
+klip,garis,frame,MAE,RMSE,MAPE_persen,n_pengamatan,n_dikecualikan_y0,total_sistem,total_manual,selisih_agregat_persen,fps_pipeline,fps_model
+2_vidiouji,"1919,926,119,1",18000,0.7167,1.4776,39.28,60,33,79,116,-31.9,20.47,22.96
+3_vidiouji,"1280,668,0,317",18000,1.05,1.5221,26.78,60,5,259,296,-12.5,21.49,23.05
+4_vidiouji,"1919,784,348,739",18000,4.15,8.3016,54.33,60,30,684,931,-26.5,19.45,22.99
