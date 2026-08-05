@@ -22,9 +22,9 @@ lanjut atau disalin ke Word/Excel.
 | 04 | [ablasi_deteksi](04_ablasi_deteksi/) | RQ2, RQ4 — ablasi + Wilcoxon + bootstrap | ✅ lengkap |
 | 05 | [analisis_nmsfree](05_analisis_nmsfree/) | RQ1, RQ3 — interaksi NMS-free | ✅ lengkap |
 | 06 | [sensitivitas_alpha](06_sensitivitas_alpha/) | Subbab 3.9 — mitigasi keterbatasan grid satu-titik | ✅ lengkap |
-| 07 | [ketegaran_normalisasi](07_ketegaran_normalisasi/) | Subbab 3.6.3 — pemeriksaan ketegaran | ⏳ V8_normw masih berjalan |
+| 07 | [ketegaran_normalisasi](07_ketegaran_normalisasi/) | Subbab 3.6.3 — pemeriksaan ketegaran | ✅ lengkap |
 | 08 | [validasi_oklusi](08_validasi_oklusi/) | Subbab 3.3.3 — validasi proksi oklusi | ✅ lengkap |
-| 09 | [counting_end_to_end](09_counting_end_to_end/) | RQ5 — penghitungan ByteTrack | ⏳ menunggu hitung manual |
+| 09 | [counting_end_to_end](09_counting_end_to_end/) | RQ5 — penghitungan ByteTrack | ✅ hasil 3 klip (GT 1 penghitung — K7) |
 | 10 | [multi_seed](10_multi_seed/) | Tabel 3.9 — validitas internal | ⏸️ menunggu keputusan K6 |
 
 ---
@@ -89,17 +89,31 @@ harus dinyatakan sebagai keterbatasan, bukan disembunyikan.
 
 ### RQ5 — Akurasi *end-to-end* dengan ByteTrack terhadap standar penerapan praktis
 
-**⏳ BELUM terjawab — menunggu dua hal:**
-1. Hitung manual dua penghitung untuk 4 klip video (`video_uji/gt_*.csv`, sedang
-   dikerjakan Naufal per 5 Agustus 2026).
-2. Ambang lulus RQ5 (target MAPE & FPS — keputusan **A-02/K5**, belum diputuskan
-   bersama pembimbing).
+**✅ Terjawab.** Counting penuh 10 menit dijalankan pada **3 klip** (2, 3, 4) dengan konvensi
+arah yang sudah diselaraskan — lihat `09_counting_end_to_end/`.
 
-Lihat `09_counting_end_to_end/README.md` untuk rincian apa yang sudah siap (garis
-virtual, konfigurasi klip, kit alat) dan apa yang masih dibutuhkan. FPS model sendiri
-**sudah tersedia**: lihat `03_kompleksitas_model/tabel_kompleksitas.csv` kolom `fps`
-(V8 = 23,3 FPS inferensi murni; ini BUKAN FPS pipeline end-to-end dengan ByteTrack,
-yang akan sedikit lebih rendah).
+| Klip | Karakter | MAE | MAPE | Selisih agregat |
+|---|---|---|---|---|
+| 2_vidiouji | lengang | 0,717 | 39,28 % | −31,9 % |
+| 3_vidiouji | arteri | 1,050 | **26,78 %** | **−12,5 %** |
+| 4_vidiouji | ramai | 4,150 | 54,33 % | −26,5 % |
+| **GABUNGAN** | 180 pengamatan | **1,972** | **37,17 %** | **−23,9 %** |
+
+**FPS pipeline end-to-end = 20,47 rata-rata** (19,2–21,4) — inilah angka untuk placeholder
+abstrak *"[XX] frame per detik"*, **BUKAN** 23,3 FPS model murni di `03_kompleksitas_model/`.
+
+**Temuan layak dibahas:** MAE naik seiring kepadatan (0,72 → 1,05 → 4,15), sejalan dugaan
+bahwa oklusi & pergantian identitas menyulitkan pelacakan pada kondisi padat.
+
+**Dua koreksi metodologis yang diterapkan** (rincian di README folder 09):
+1. **Konvensi arah in/out diselaraskan** — sistem awalnya terbalik dari definisi penghitung
+   manual; setelah dikoreksi MAPE klip 3 turun 54,79 % → 26,78 %.
+2. **Klip 1 dikecualikan** — segmen garisnya tak menjangkau lajur mobil sehingga GT dan
+   sistem mengukur populasi berbeda (cacat validitas pengukuran, bukan performa model).
+   ⚠️ **Wajib dinyatakan eksplisit di BAB 4/5.**
+
+**Masih terbuka:** GT dari satu penghitung (protokol 3.10.1 menuntut dua — **K7**) dan
+ambang lulus RQ5 (**A-02/K5**) belum ditetapkan pembimbing.
 
 ---
 
@@ -118,6 +132,15 @@ Daftar ini bukan kegagalan — ini kejujuran ilmiah yang justru memperkuat kredi
    optimal untuk varian lain.
 4. **Data uji counting hanya mencakup tier sparse & medium** (tidak ada interval tier
    dense >25 objek/frame) — keterbatasan lokasi CCTV yang terjangkau (keputusan K7).
+4b. **Satu klip (1_vidiouji) dikecualikan dari evaluasi RQ5** karena segmen garis virtualnya
+   tidak menjangkau lajur yang dipakai mobil, sehingga hitung manual dan keluaran sistem
+   mengukur populasi kendaraan yang berbeda (0 mobil sistem vs 20 manual). **Alasan ini
+   wajib ditulis apa adanya** — pengecualian data setelah hasil terlihat berpotensi dianggap
+   penyaringan hasil bila tidak dijelaskan sebagai cacat penyiapan pengukuran. Evaluasi
+   akhir memakai 3 klip / 180 pengamatan (protokol 3.10.1 tetap terpenuhi: ≥3 klip,
+   masing-masing ≥10 menit, titik pengamatan berbeda).
+4c. **GT counting berasal dari satu penghitung**, sedangkan Subbab 3.10.1 menjanjikan dua
+   penghitung independen + pelaporan tingkat kesesuaian awal (keputusan **K7** terbuka).
 5. **Multi-seed (K6) belum dijalankan** — lihat folder 10.
 6. **Grid search DALW dilakukan pada pelatihan dipersingkat (60 epoch)** pada satu varian
    (V8) — bukan pada kedelapan varian penuh (keterbatasan biaya komputasi, diakui naskah
