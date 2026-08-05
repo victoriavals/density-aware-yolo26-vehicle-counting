@@ -1,0 +1,2 @@
+n_klip,n_pengamatan,MAE,RMSE,MAPE_persen,n_dikecualikan_y0,frac_dikecualikan,total_manual,total_sistem,selisih_agregat_persen,fps_pipeline_rata2,fps_pipeline_min,fps_pipeline_maks,klip_dipakai,klip_dikecualikan
+3,180,1.9722,4.9469,37.17,68,0.3778,1343,1022,-23.9,20.47,19.45,21.49,2_vidiouji; 3_vidiouji; 4_vidiouji,1_vidiouji (segmen garis tak menjangkau lajur mobil)
