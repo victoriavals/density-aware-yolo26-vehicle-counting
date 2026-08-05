@@ -1,0 +1,10 @@
+time_s,interval,tracker_id,class,direction
+6.97,0,6,two-wheeler,out
+11.57,0,10,two-wheeler,out
+12.5,0,11,two-wheeler,out
+27.77,0,16,two-wheeler,out
+34.97,0,23,two-wheeler,out
+36.57,0,25,two-wheeler,out
+51.1,0,35,two-wheeler,out
+52.97,0,38,two-wheeler,in
+54.7,0,40,two-wheeler,out
