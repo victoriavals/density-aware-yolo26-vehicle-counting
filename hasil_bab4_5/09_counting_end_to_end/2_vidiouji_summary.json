@@ -1,0 +1,29 @@
+{
+  "video": "video_uji/2_vidiouji.mp4",
+  "frames": 18000,
+  "fps_video": 30.0,
+  "fps_model": 22.95558264523254,
+  "fps_pipeline": 20.465508993975064,
+  "line": [
+    1919,
+    926,
+    119,
+    1
+  ],
+  "interval_s": 60,
+  "totals": {
+    "two-wheeler_in": 52,
+    "two-wheeler_out": 17,
+    "big-vehicle_in": 2,
+    "car_in": 5,
+    "car_out": 3
+  },
+  "metrics": {
+    "T": 60,
+    "MAE": 0.7166666666666667,
+    "RMSE": 1.4776106839534333,
+    "MAPE": 39.2827748383304,
+    "mape_excluded": 33,
+    "mape_excluded_frac": 0.55
+  }
+}
