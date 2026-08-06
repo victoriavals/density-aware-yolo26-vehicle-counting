@@ -172,3 +172,43 @@ bahan mentah BAB 4 — jangan dihapus/ditimpa.
   dan terverifikasi pada video sintetis (artefak uji dihapus). P10 counting nyata
   belum dijalankan — butuh video uji CCTV, `gt_<nama>.csv` terisi manual, dan
   ambang A-02. Lihat [progress](../status/progress.md).
+
+## Hasil aktual RQ5 (5 Agustus 2026)
+
+**3 klip × 10 interval × 3 kelas × 2 arah = 180 pengamatan.** MAE **1,972** · RMSE **4,947** ·
+MAPE **37,17 %** (68/180 pengamatan y=0 dikecualikan, aturan Subbab 3.11.3) · selisih agregat
+**−23,9 %** (sistem 1.022 vs manual 1.343) · **FPS pipeline 20,47** (19,45–21,49).
+
+⚠️ **TIGA konteks pengukuran kecepatan, jangan tertukar.** (1) Tabel 3.7 `eval_out/complexity.csv`
+= FPS **model murni pada tolok ukur standar** (V1 32,39; V4 30,51; V8 23,31) — BUKAN kecepatan
+sistem. (2) `summary.json` `fps_model` = forward pass pada video nyata. (3) `summary.json`
+`fps_pipeline` = **termasuk ByteTrack + line crossing** — inilah satu-satunya angka yang sah
+untuk klaim *real-time* dan placeholder abstrak. Terukur pada klip terpadat
+(`counting_out/fps_probe/`, 1.800 bingkai): V1 23,28 · V4_a2.0 23,20 · V8 **19,29** FPS.
+Rata-rata tiga klip penuh: **20,47**. Sumber direkam 30,0 FPS → **tak satu pun varian
+mencapai laju sumber**; jangan mengklaim 30 FPS dari Tabel 3.7.
+
+⚠️ **Konvensi arah in/out harus diselaraskan sebelum menghitung MAE.** `sv.LineZone`
+menentukan in/out dari **orientasi garis** (titik A→B pada `--line`), sedangkan penghitung
+manusia memakai definisi visualnya sendiri. Pada proyek ini konvensi penghitung adalah
+**"in" = kendaraan menuju kiri-bawah bingkai**, sedangkan LineZone menganggap "in" = menuju
+kanan-atas → **terbalik seragam** di keempat klip. Perbaikan: **balik urutan titik garis**
+(`--line x2,y2,x1,y1`) — geometri identik, hanya arah pembacaan berubah; diverifikasi empiris
+(klip 4: `car_out=15` → `car_in=15`). Dampaknya besar: MAPE klip 3 turun 54,79 % → **26,78 %**.
+
+⚠️ **Periksa geometri garis per kelas.** Garis harus benar-benar memotong lajur yang dipakai
+SETIAP kelas. Klip 1 dikecualikan dari evaluasi karena segmennya berakhir sebelum lajur mobil:
+hitung manual mencatat 20 mobil sementara sistem 0 → GT dan sistem mengukur **populasi
+berbeda** (cacat validitas pengukuran, bukan performa model). Cara mendeteksi: lacak per
+bingkai lalu hitung berapa *track* per kelas yang benar-benar **berpindah sisi** garis
+(klip 1: hanya 2 dari 24 track mobil).
+
+**Pola galat per kelas** (bahan analisis Subbab 3.11.6): roda dua paling andal (−9 % bahkan
+pada klip terpadat; kelas mayoritas), mobil bergantung geometri garis (tepat pada 2 klip,
+−56 % pada klip 4), kendaraan besar terlemah (0 dari 21 pada klip terpadat; kelas minoritas).
+MAE naik seiring kepadatan (0,72 → 1,05 → 4,15).
+
+**Status protokol:** GT masih dari **satu** penghitung; Subbab 3.10.1 menjanjikan dua +
+pelaporan tingkat kesesuaian awal (alat: `bandingkan_gt.py`, keputusan **K7b** terbuka).
+Hasil & grafik: `hasil_bab4_5/09_counting_end_to_end/`.
+
