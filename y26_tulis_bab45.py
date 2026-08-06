@@ -33,6 +33,7 @@ HB = ROOT / "hasil_bab4_5"
 OUT = ROOT / "TESIS_BAB4-5.docx"
 
 FONT = "Times New Roman"
+LEBAR_TEKS = 14.0   # 21 cm - margin kiri 4 cm - margin kanan 3 cm
 SPASI = 1.15
 INDENT = Cm(1.0)
 
@@ -46,12 +47,18 @@ def baca_json(rel: str):
     return json.loads((HB / rel).read_text(encoding="utf-8"))
 
 
+def rib(n) -> str:
+    """Bilangan bulat dengan pemisah ribuan gaya Indonesia (titik)."""
+    return f"{int(n):,}".replace(",", ".")
+
+
 def ind(x, desimal: int = 2, persen: bool = False) -> str:
     """Format angka gaya Indonesia (koma desimal). persen=True mengalikan 100."""
     if x is None or x == "":
         return "-"
     v = float(x) * (100 if persen else 1)
-    return f"{v:.{desimal}f}".replace(".", ",")
+    # Naskah BAB 1-3 memakai minus tipografis U+2212, bukan hyphen-minus. Samakan.
+    return f"{v:.{desimal}f}".replace(".", ",").replace("-", "−")
 
 
 # --------------------------------------------------------------- gaya dokumen
@@ -203,9 +210,12 @@ def tabel(doc, header: list[str], baris: list[list], lebar: list[float] | None =
             pf.space_after = Pt(0)
             tulis_runs(c.paragraphs[0], str(teks), size=Pt(size_body))
     if lebar:
+        # Skala lebar kolom agar total tepat selebar kolom teks (21 - 4 - 3 = 14 cm),
+        # sehingga tabel tidak melebar ke area margin.
+        faktor = LEBAR_TEKS / sum(lebar)
         for r in t.rows:
             for i, w in enumerate(lebar):
-                r.cells[i].width = Cm(w)
+                r.cells[i].width = Cm(w * faktor)
     return t
 
 
@@ -235,6 +245,7 @@ class Nomor:
 
 
 def gambar(doc, nomor: Nomor, rel: str, judul: str, lebar_cm: float = 13.5) -> str:
+    lebar_cm = min(lebar_cm, LEBAR_TEKS)
     p = doc.add_paragraph()
     p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p.paragraph_format.first_line_indent = Cm(0)
