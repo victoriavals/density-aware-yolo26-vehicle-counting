@@ -206,6 +206,61 @@ def bab_04_ablasi():
         ax.legend(fontsize=8); fig.tight_layout()
         simpan(fig, d / f"grafik_strata_{dim}.png")
 
+    # Selisih AP per strata untuk narasi BAB 4. Dihitung DUA cara supaya perbedaannya
+    # terlihat: (a) seluruh sel non-kosong, (b) hanya sel n_gt >= MIN_CELL_GT, konsisten
+    # dengan aturan sel minimum Subbab 3.11.5 yang dipakai uji Wilcoxon. Angka narasi
+    # WAJIB memakai kolom (b) — kolom (a) memuat sel bervolume 1-27 objek yang membalik
+    # tanda pada beberapa strata (mis. density/dense).
+    from y26_stats import MIN_CELL_GT
+    per_cell = defaultdict(dict)
+    for r in strata:
+        if r["dim"] == "global":
+            continue
+        per_cell[(r["dim"], r["stratum"], r["class"])][r["variant"]] = (
+            int(r["n_gt"] or 0), float(r["AP50_95"]))
+    with open(d / "delta_strata.csv", "w", newline="", encoding="utf-8") as fh:
+        w_ = csv.writer(fh)
+        w_.writerow(["pasangan", "dim", "stratum", "n_kelas_semua", "delta_pp_semua_sel",
+                     "n_kelas_selmin", "delta_pp_selmin", "kelas_dipakai", "kelas_dibuang",
+                     "layak_dinarasikan"])
+        for a, b in (("V8", "V1"), ("V4", "V1"), ("V8", "V5")):
+            for dim, tiers in (("size", ("small", "medium", "large")),
+                               ("occlusion", ("no", "partial", "heavy")),
+                               ("density", ("sparse", "medium", "dense"))):
+                for t in tiers:
+                    semua, selmin, dipakai, dibuang = [], [], [], []
+                    for (dd, ss, cls), v in per_cell.items():
+                        if (dd, ss) != (dim, t) or a not in v or b not in v:
+                            continue
+                        (na, apa), (nb, apb) = v[a], v[b]
+                        if na == 0 or nb == 0:
+                            continue
+                        semua.append(apa - apb)
+                        if min(na, nb) >= MIN_CELL_GT:
+                            selmin.append(apa - apb)
+                            dipakai.append(cls)
+                        else:
+                            dibuang.append(f"{cls}(n={min(na, nb)})")
+                    if not semua:
+                        continue
+                    # Kendaraan = kelas yang benar-benar dihitung; pedestrian hanya konteks
+                    # (dikecualikan dari penghitungan, CLAUDE.md §5). Strata yang hanya
+                    # bersisa pedestrian TIDAK boleh dinarasikan sebagai hasil kendaraan.
+                    kendaraan = [c for c in dipakai if c != "pedestrian"]
+                    if not selmin:
+                        layak = "TIDAK - semua sel < 30 GT"
+                    elif not kendaraan:
+                        layak = "TIDAK - hanya pedestrian (kelas konteks) yang lolos"
+                    elif len(dipakai) == 1:
+                        layak = f"HATI-HATI - hanya 1 kelas ({dipakai[0]})"
+                    else:
+                        layak = "ya"
+                    w_.writerow([
+                        f"{a}-{b}", dim, t, len(semua), f"{100 * np.mean(semua):+.2f}",
+                        len(selmin),
+                        f"{100 * np.mean(selmin):+.2f}" if selmin else "",
+                        "; ".join(sorted(dipakai)), "; ".join(dibuang), layak])
+
     wil = list(csv.DictReader(open(ROOT / "eval_out/wilcoxon_ap5095.csv")))
     boot = list(csv.DictReader(open(ROOT / "eval_out/bootstrap_ci.csv")))
     boot_by_pair = {r["pair"]: r for r in boot}
@@ -554,6 +609,235 @@ def bab_09_counting(klip=KLIP_COUNTING):
     return ringkas
 
 
+# ======================================================================
+# 11 — ANALISIS GALAT (Subbab 4.11)
+# ======================================================================
+# Matriks kekeliruan pada SPLIT UJI (bukan val bawaan training), dekomposisi FP/FN per
+# strata, dan kasus kegagalan terburuk. Seluruhnya dihitung dari cache_V*.npz — objek
+# yang sama yang dipakai stratified_ap, sehingga angkanya konsisten dengan Subbab 4.5.
+GALAT_IOU = 0.50      # ambang pencocokan (konvensi COCO untuk matriks kekeliruan)
+GALAT_CONF = 0.25     # ambang keyakinan; sama dengan default y26_counting.py --conf
+
+
+def _cocokkan(pred, gt, n_cls, iou_thr=GALAT_IOU, conf_thr=GALAT_CONF):
+    """Cocokkan prediksi<->GT per citra (serakah, skor menurun, tanpa syarat kelas).
+
+    Mengembalikan (cm, gt_match, pred_keep, pred_match) dengan cm berukuran
+    (n_cls+1, n_cls+1); indeks n_cls = latar (FN pada baris, FP pada kolom).
+    """
+    from ultralytics.utils.metrics import box_iou
+    import torch
+
+    cm = np.zeros((n_cls + 1, n_cls + 1), np.int64)
+    pred = pred[pred[:, 5] >= conf_thr]
+    gt_match = np.full(len(gt), -1, np.int64)      # indeks prediksi pasangan, -1 = FN
+    pred_match = np.full(len(pred), -1, np.int64)  # indeks GT pasangan, -1 = FP
+    for img in np.unique(np.concatenate([gt[:, 0], pred[:, 0]]) if len(pred) else gt[:, 0]):
+        gi = np.flatnonzero(gt[:, 0] == img)
+        pi = np.flatnonzero(pred[:, 0] == img)
+        if len(gi) and len(pi):
+            iou = box_iou(torch.as_tensor(gt[gi, 1:5]), torch.as_tensor(pred[pi, 1:5])).numpy()
+            for j in np.argsort(-pred[pi, 5]):          # prediksi paling yakin lebih dulu
+                k = int(np.argmax(iou[:, j]))
+                if iou[k, j] >= iou_thr:
+                    gt_match[gi[k]] = pi[j]
+                    pred_match[pi[j]] = gi[k]
+                    iou[k, :] = -1                      # GT terpakai
+        for k in gi:
+            c_gt = int(gt[k, 5])
+            cm[c_gt, int(pred[gt_match[k], 6]) if gt_match[k] >= 0 else n_cls] += 1
+        for j in pi:
+            if pred_match[j] < 0:
+                cm[n_cls, int(pred[j, 6])] += 1
+    return cm, gt_match, pred, pred_match
+
+
+def bab_11_analisis_galat(variants=("V1", "V5", "V8")):
+    import y26_strata as ys
+
+    d = OUT / "11_analisis_galat"; d.mkdir(parents=True, exist_ok=True)
+    import yaml
+    kelas = list(yaml.safe_load(open(ROOT / "dataset/data.yaml"))["names"])
+    n_cls = len(kelas)
+    label = kelas + ["latar (tak terdeteksi / palsu)"]
+    hasil, ringkas = {}, []
+
+    for v in variants:
+        z = np.load(ROOT / f"eval_out/cache_{v}.npz", allow_pickle=True)
+        pred, gt, n_img = z["pred"], z["gt"], int(z["n_images"])
+        cm, gt_match, pk, pred_match = _cocokkan(pred, gt, n_cls)
+        hasil[v] = (cm, gt, gt_match, pk, pred_match, n_img)
+
+        with open(d / f"matriks_kekeliruan_{v}.csv", "w", newline="", encoding="utf-8") as fh:
+            w = csv.writer(fh); w.writerow(["gt\\pred"] + label)
+            for i, nm in enumerate(label):
+                w.writerow([nm] + list(cm[i]))
+
+        fig, ax = plt.subplots(figsize=(6.4, 5.4))
+        norm = cm / np.maximum(cm.sum(1, keepdims=True), 1)   # dinormalisasi per baris GT
+        im = ax.imshow(norm, cmap="Blues", vmin=0, vmax=1)
+        for i in range(n_cls + 1):
+            for j in range(n_cls + 1):
+                if cm[i, j]:
+                    ax.text(j, i, f"{cm[i, j]}\n{100*norm[i, j]:.0f}%", ha="center",
+                            va="center", fontsize=7.5,
+                            color="white" if norm[i, j] > 0.55 else "black")
+        ax.set_xticks(range(n_cls + 1), label, rotation=35, ha="right", fontsize=8)
+        ax.set_yticks(range(n_cls + 1), label, fontsize=8)
+        ax.set_xlabel("prediksi"); ax.set_ylabel("kebenaran dasar")
+        ax.set_title(f"Matriks kekeliruan {VARIAN_LABEL.get(v, v)} — data uji\n"
+                     f"(IoU {GALAT_IOU}, conf {GALAT_CONF}; % dinormalisasi per baris)",
+                     fontsize=10)
+        fig.colorbar(im, ax=ax, shrink=0.8); fig.tight_layout()
+        simpan(fig, d / f"grafik_matriks_kekeliruan_{v}.png")
+
+    # --- dekomposisi FN per strata GT, dan FP menurut atribut kotak prediksi ---
+    z0 = np.load(ROOT / f"eval_out/cache_{variants[0]}.npz", allow_pickle=True)
+    atr = ys.gt_attributes(z0["gt"], int(z0["n_images"]))
+    TIER = {"size": ("small", "medium", "large"), "occlusion": ("no", "partial", "heavy"),
+            "density": ("sparse", "medium", "dense")}
+    with open(d / "dekomposisi_fp_fn.csv", "w", newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh)
+        w.writerow(["varian", "dim", "stratum", "n_gt", "n_fn", "fn_persen",
+                    "n_salah_kelas", "n_fp_prediksi", "catatan"])
+        for v in variants:
+            cm, gt, gt_match, pk, pred_match, n_img = hasil[v]
+            img_ids = gt[:, 0].astype(int)
+            for dim, tiers in TIER.items():
+                t_gt = (atr["size_t"] if dim == "size" else atr["occ_t"] if dim == "occlusion"
+                        else atr["den_t"][img_ids])
+                # atribut prediksi: ukuran dari kotaknya sendiri; densitas dari citranya.
+                # Oklusi TIDAK dapat diturunkan untuk FP (proksi butuh pasangan GT).
+                if dim == "size":
+                    a = (pk[:, 3] - pk[:, 1]) * (pk[:, 4] - pk[:, 2])
+                    t_pred = ys._tier(a, ys.SIZE_EDGES)
+                elif dim == "density":
+                    t_pred = atr["den_t"][pk[:, 0].astype(int)]
+                else:
+                    t_pred = None
+                for ti, nama in enumerate(tiers):
+                    m = t_gt == ti
+                    n_gt = int(m.sum())
+                    if not n_gt:
+                        continue
+                    fn = int((gt_match[m] < 0).sum())
+                    cocok = m & (gt_match >= 0)
+                    salah = int((gt[cocok, 5] != pk[gt_match[cocok], 6]).sum())
+                    if t_pred is None:
+                        n_fp, catatan = "", "FP tak dapat distratifikasi (proksi oklusi butuh pasangan GT)"
+                    else:
+                        n_fp = int(((pred_match < 0) & (t_pred == ti)).sum()); catatan = ""
+                    w.writerow([v, dim, nama, n_gt, fn, round(100 * fn / n_gt, 2),
+                                salah, n_fp, catatan])
+
+    # --- grafik: laju FN per strata, V1 vs V8 ---
+    baris = list(csv.DictReader(open(d / "dekomposisi_fp_fn.csv", encoding="utf-8")))
+    for dim, tiers in TIER.items():
+        ada = [t for t in tiers if any(r["dim"] == dim and r["stratum"] == t for r in baris)]
+        if not ada:
+            continue
+        fig, ax = plt.subplots(figsize=(7.2, 4))
+        x = np.arange(len(ada)); w_ = 0.8 / len(variants)
+        for i, v in enumerate(variants):
+            ys_ = [next((float(r["fn_persen"]) for r in baris
+                         if r["varian"] == v and r["dim"] == dim and r["stratum"] == t), 0)
+                   for t in ada]
+            ax.bar(x + (i - (len(variants) - 1) / 2) * w_, ys_, w_,
+                   label=VARIAN_LABEL.get(v, v), color=WARNA.get(v))
+        ax.set_xticks(x, ada); ax.set_ylabel("objek tak terdeteksi (%)")
+        ax.set_title(f"Laju objek terlewat per strata — dimensi {dim} (data uji)")
+        ax.legend(fontsize=8); fig.tight_layout()
+        simpan(fig, d / f"grafik_fn_per_strata_{dim}.png")
+
+    # --- kasus kegagalan terburuk (citra dengan FN terbanyak pada model penuh) ---
+    v = variants[-1]
+    cm, gt, gt_match, pk, pred_match, n_img = hasil[v]
+    nama_citra = list(np.load(ROOT / f"eval_out/cache_{v}.npz", allow_pickle=True)["names"])
+    fn_per_img = np.zeros(n_img, int)
+    for k in np.flatnonzero(gt_match < 0):
+        fn_per_img[int(gt[k, 0])] += 1
+    urut = np.argsort(-fn_per_img)[:10]
+    with open(d / "kasus_kegagalan.csv", "w", newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh)
+        w.writerow(["peringkat", "citra", "n_gt", "n_terlewat", "n_prediksi_palsu", "kepadatan"])
+        for r, i in enumerate(urut, 1):
+            w.writerow([r, nama_citra[i], int((gt[:, 0] == i).sum()), int(fn_per_img[i]),
+                        int(((pred_match < 0) & (pk[:, 0] == i)).sum()),
+                        TIER["density"][int(atr["den_t"][i])]])
+        ringkas = [nama_citra[i] for i in urut[:3]]
+
+    # --- montase kualitatif 3 kasus terburuk: hijau = GT, merah = prediksi ---
+    import cv2
+    img_dir = ROOT / "dataset/test/images"
+    ada = [i for i in urut[:3] if (img_dir / nama_citra[i]).exists()]
+    if ada:
+        fig, axes = plt.subplots(1, len(ada), figsize=(5.0 * len(ada), 4.4))
+        for ax, i in zip(np.atleast_1d(axes), ada):
+            im = cv2.cvtColor(cv2.imread(str(img_dir / nama_citra[i])), cv2.COLOR_BGR2RGB)
+            h, w0 = im.shape[:2]
+            # cache berada di ruang letterbox 640 -> kembalikan ke piksel citra asli
+            s = min(640 / h, 640 / w0); px, py = (640 - w0 * s) / 2, (640 - h * s) / 2
+            for b in gt[gt[:, 0] == i]:
+                x1, y1, x2, y2 = (b[1] - px) / s, (b[2] - py) / s, (b[3] - px) / s, (b[4] - py) / s
+                ax.add_patch(plt.Rectangle((x1, y1), x2 - x1, y2 - y1, fill=False,
+                                           ec="#2ca02c", lw=1.4))
+            for b in pk[pk[:, 0] == i]:
+                x1, y1, x2, y2 = (b[1] - px) / s, (b[2] - py) / s, (b[3] - px) / s, (b[4] - py) / s
+                ax.add_patch(plt.Rectangle((x1, y1), x2 - x1, y2 - y1, fill=False,
+                                           ec="#d62728", lw=1.0, ls="--"))
+            ax.imshow(im); ax.set_axis_off()
+            ax.set_title(f"{int((gt[:, 0] == i).sum())} objek, {fn_per_img[i]} terlewat",
+                         fontsize=9)
+        fig.suptitle(f"Kasus kegagalan terburuk {VARIAN_LABEL.get(v, v)} — "
+                     f"hijau: kebenaran dasar, merah putus-putus: prediksi", fontsize=10)
+        fig.tight_layout()
+        simpan(fig, d / "grafik_kasus_kegagalan.png")
+
+    # --- dekomposisi siang/malam + per kelas: dua sumbu galat yang paling menjelaskan ---
+    # Penanda malam diambil dari nama berkas Roboflow ("night-traffic-*"), bukan analisis
+    # citra — sederhana, deterministik, dan dapat diperiksa ulang dari daftar nama.
+    malam = np.array(["night" in s.lower() for s in nama_citra])
+    with open(d / "galat_siang_malam.csv", "w", newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh)
+        w.writerow(["varian", "kelompok", "n_citra", "n_gt", "n_terlewat", "fn_persen"])
+        for vv in variants:
+            _, g2, gm2, _, _, _ = hasil[vv]
+            ids = g2[:, 0].astype(int)
+            for nama_k, msk, n_im in (("malam", malam[ids], int(malam.sum())),
+                                      ("siang", ~malam[ids], int((~malam).sum()))):
+                tot = int(msk.sum()); fn = int((gm2[msk] < 0).sum())
+                w.writerow([vv, nama_k, n_im, tot, fn, round(100 * fn / max(tot, 1), 2)])
+    with open(d / "galat_per_kelas.csv", "w", newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh)
+        w.writerow(["varian", "kelas", "n_gt", "n_terlewat", "fn_persen", "n_salah_kelas"])
+        for vv in variants:
+            _, g2, gm2, pk2, _, _ = hasil[vv]
+            for c, k in enumerate(kelas):
+                m = g2[:, 5] == c
+                fn = int((gm2[m] < 0).sum())
+                ck = m & (gm2 >= 0)
+                w.writerow([vv, k, int(m.sum()), fn, round(100 * fn / max(int(m.sum()), 1), 2),
+                            int((g2[ck, 5] != pk2[gm2[ck], 6]).sum())])
+
+    fig, ax = plt.subplots(figsize=(7.6, 4))
+    x = np.arange(len(kelas)); w_ = 0.8 / len(variants)
+    for i, vv in enumerate(variants):
+        _, g2, gm2, _, _, _ = hasil[vv]
+        ys_ = [100 * float((gm2[g2[:, 5] == c] < 0).sum()) / max(int((g2[:, 5] == c).sum()), 1)
+               for c in range(len(kelas))]
+        ax.bar(x + (i - (len(variants) - 1) / 2) * w_, ys_, w_,
+               label=VARIAN_LABEL.get(vv, vv), color=WARNA.get(vv))
+    ax.set_xticks(x, kelas); ax.set_ylabel("objek tak terdeteksi (%)")
+    ax.set_title("Laju objek terlewat per kelas — data uji")
+    ax.legend(fontsize=8); fig.tight_layout()
+    simpan(fig, d / "grafik_fn_per_kelas.png")
+
+    total_fn = {v: int((hasil[v][2] < 0).sum()) for v in variants}
+    print(f"  FN total (dari {len(gt)} objek uji): " +
+          ", ".join(f"{v}={n} ({100*n/len(gt):.1f}%)" for v, n in total_fn.items()))
+    return {"fn_total": total_fn, "kasus_terburuk": ringkas}
+
+
 if __name__ == "__main__":
     print("01 dataset..."); bab_01_dataset()
     print("02 grid search..."); bab_02_grid()
@@ -565,4 +849,6 @@ if __name__ == "__main__":
     print("  ", rows7)
     print("08 validasi oklusi..."); r8 = bab_08_oklusi()
     print("  agreement:", r8["agreement"])
+    print("11 analisis galat..."); r11 = bab_11_analisis_galat()
+    print("  ", r11["fn_total"])
     print("SELESAI")
