@@ -44,7 +44,7 @@ P2 memperbanyak kandidat objek kecil pada *stride*-4, yang berpotensi menaikkan 
 
 ## Peran dalam desain eksperimen
 
-Dalam faktorial penuh HAM × P2 × DALW (delapan varian, CLAUDE.md §6), P2 adalah satu faktor biner. Varian yang memuatnya: V3 (P2 saja), V5 (HAM+P2), V7 (P2+DALW), V8 (model penuh). Salah satu dari tiga hipotesis utama, **V8–V5**, mengisolasi kontribusi DALW *di atas* fondasi HAM+P2; hasil P7 menunjukkan pasangan ini signifikan (p=0,0125, r=+0,486), sehingga peran P2 di sini adalah menyediakan fondasi kuat tempat DALW terbukti komplementer. Angka evaluasi terstratifikasi dan protokol Wilcoxon ada di [Evaluasi](evaluation.md) dan [Statistik](statistics.md).
+Dalam faktorial penuh HAM × P2 × DALW (delapan varian, CLAUDE.md §6), P2 adalah satu faktor biner. Varian yang memuatnya: V3 (P2 saja), V5 (HAM+P2), V7 (P2+DALW), V8 (model penuh). Salah satu dari tiga hipotesis utama, **V8–V5**, mengisolasi kontribusi DALW *di atas* fondasi HAM+P2; hasil final pasca-FASE 1 menunjukkan pasangan ini signifikan (p=0,0367, r=+0,487), sehingga peran P2 di sini adalah menyediakan fondasi kuat tempat DALW terbukti komplementer. Angka evaluasi terstratifikasi dan protokol Wilcoxon ada di [Evaluasi](evaluation.md) dan [Statistik](statistics.md).
 
 ## Rujukan kode & artefak
 
