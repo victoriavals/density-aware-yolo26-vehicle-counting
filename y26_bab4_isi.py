@@ -6,8 +6,8 @@ istilah asing dicetak miring lewat penanda *bintang*, desimal memakai koma).
 """
 from __future__ import annotations
 
-from y26_tulis_bab45 import (Nomor, baca_csv, baca_json, gambar, h2, h3, halaman_baru,
-                             h1, ind, par, tabel)
+from y26_tulis_bab45 import (Nomor, baca_csv, baca_json, gambar, h1, h2, h3,
+                             halaman_baru, ind, par, rib, tabel)
 
 LBL = {"V1": "V1 (dasar)", "V2": "V2 (HAM)", "V3": "V3 (P2)", "V4": "V4 (DALW)",
        "V5": "V5 (HAM+P2)", "V6": "V6 (HAM+DALW)", "V7": "V7 (P2+DALW)",
@@ -77,9 +77,9 @@ def tulis_bab4(doc) -> Nomor:
     te = next(r for r in dist if r["split"] == "test")
     tot = sum(int(r["n_citra"]) for r in dist)
     par(doc, f"Pembagian data berbasis kelompok kamera, adegan, dan sesi perekaman "
-             f"sebagaimana dirancang pada Subbab 3.3.2 menghasilkan {int(tr['n_citra']):,} "
-             f"citra latih, {int(va['n_citra']):,} citra validasi, dan {int(te['n_citra']):,} "
-             f"citra uji dari total {tot:,} citra, atau setara proporsi 70,0 persen, 20,0 "
+             f"sebagaimana dirancang pada Subbab 3.3.2 menghasilkan {rib(tr['n_citra'])} "
+             f"citra latih, {rib(va['n_citra'])} citra validasi, dan {rib(te['n_citra'])} "
+             f"citra uji dari total {rib(tot)} citra, atau setara proporsi 70,0 persen, 20,0 "
              f"persen, dan 10,0 persen. Prosedur pembagian bersifat deterministik: kelompok "
              f"diurutkan menurut penanda yang stabil lalu dipotong pada ambang kumulatif, "
              f"sehingga pengulangan prosedur pada mesin mana pun menghasilkan pembagian yang "
@@ -87,8 +87,7 @@ def tulis_bab4(doc) -> Nomor:
              f"*md5* yang sama muncul pada dua subset berbeda, dan tidak ada kelompok yang "
              f"anggotanya tersebar lintas subset. Bukti pembagian tersimpan sebagai dua berkas "
              f"terpisah yang memuat daftar kelompok beserta subset tujuannya dan daftar citra "
-             f"beserta kelompok asalnya, dan keduanya dilampirkan pada Lampiran 1."
-             .replace(",", "."))
+             f"beserta kelompok asalnya, dan keduanya dilampirkan pada Lampiran 1.")
     par(doc, "Perlu dicatat bahwa ekspor awal dari layanan anotasi daring yang digunakan "
              "sebelumnya terbukti mengandung kebocoran data, yaitu tiga pasang citra yang "
              "identik secara *byte* muncul pada subset yang berbeda, dengan proporsi pembagian "
@@ -216,7 +215,7 @@ def tulis_bab4(doc) -> Nomor:
              f"objek kebenaran dasar sebagaimana disyaratkan Subbab 3.11.5 menyisakan "
              f"{h1_['n']} sel dari 36 sel yang mungkin, dengan {h1_['n_sel_dibuang']} sel "
              f"dikeluarkan karena volumenya terlalu kecil. Daftar lengkap sel yang dikeluarkan "
-             f"disajikan pada Lampiran 5 dan tidak dihilangkan secara diam-diam.")
+             f"disajikan pada Lampiran 3 dan tidak dihilangkan secara diam-diam.")
     N.tabel(doc, "Hasil Uji Wilcoxon dan Selang Kepercayaan Bootstrap untuk Tiga Hipotesis Utama")
     tabel(doc, ["Hipotesis", "Statistik W", "Nilai p", "Korelasi *rank-biserial*",
                 "Median selisih", "Selang *bootstrap* 95% (poin persentase)", "Simpulan"],
@@ -295,15 +294,15 @@ def tulis_bab4(doc) -> Nomor:
                         if r["pasangan"] == "V8-V1" and r["dim"] == dim and r["stratum"] == st),
                        "")
             baris.append([f"{nama_dim} — {STRATA_ID.get(st, st)}",
-                          a.replace(".", ",") if a else "tidak tersedia",
-                          b.replace(".", ",") if b else "tidak tersedia",
+                          a.replace(".", ",").replace("-", "−") if a else "tidak tersedia",
+                          b.replace(".", ",").replace("-", "−") if b else "tidak tersedia",
                           "ya" if ket == "ya" else "tidak"])
     tabel(doc, ["Strata", "V8 − V1 (poin persentase)", "V8 − V5 (poin persentase)",
                 "Layak dinarasikan"], baris, lebar=[4.6, 4.0, 4.0, 3.4])
     par(doc, f"Perbaikan terbesar dari kontribusi pembobotan berbasis densitas terjadi pada "
-             f"strata oklusi parsial sebesar {ds('V8-V5', 'occlusion', 'partial').replace('.', ',')} "
+             f"strata oklusi parsial sebesar {ds('V8-V5', 'occlusion', 'partial').replace('.', ',').replace('-', '−')} "
              f"poin persentase dan pada strata objek berukuran kecil sebesar "
-             f"{ds('V8-V5', 'size', 'small').replace('.', ',')} poin persentase. Kedua strata "
+             f"{ds('V8-V5', 'size', 'small').replace('.', ',').replace('-', '−')} poin persentase. Kedua strata "
              f"tersebut merupakan dua dari tiga tantangan yang diidentifikasi pada Bab I, "
              f"sehingga hasil ini memberi dukungan langsung terhadap premis penelitian.")
     par(doc, "Tantangan ketiga, yaitu kepadatan ekstrem, justru tidak dapat dinilai. Setelah "
@@ -471,7 +470,7 @@ def tulis_bab4(doc) -> Nomor:
              "Urutan relatif antarvarian juga bertahan pada hampir seluruh rentang ambang, "
              "sehingga simpulan yang ditarik pada ambang yang ditetapkan Bab III tidak "
              "bergantung pada pemilihan nilai ambang tertentu. Data lengkap dua belas nilai "
-             "ambang disajikan pada Lampiran 8.")
+             "ambang disajikan pada Lampiran 7.")
 
     # ---------------------------------------------------------------- 4.9
     h2(doc, "4.9 Validasi Proksi Oklusi")
