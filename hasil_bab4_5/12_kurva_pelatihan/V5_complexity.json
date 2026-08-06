@@ -1,0 +1,7 @@
+{
+  "train_hours": 10.242294321788682,
+  "peak_gpu_alloc_gb": 8.640289306640625,
+  "peak_gpu_reserved_gb": 11.79296875,
+  "epochs_ran": 98,
+  "batch": 16
+}
