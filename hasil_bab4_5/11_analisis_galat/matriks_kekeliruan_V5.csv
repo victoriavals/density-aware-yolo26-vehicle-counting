@@ -1,0 +1,6 @@
+gt\pred,big-vehicle,car,pedestrian,two-wheeler,latar (tak terdeteksi / palsu)
+big-vehicle,233,20,0,0,79
+car,18,589,0,3,155
+pedestrian,0,0,521,15,102
+two-wheeler,0,3,3,671,188
+latar (tak terdeteksi / palsu),62,218,365,489,0
