@@ -22,15 +22,50 @@ Berkas sumber (kanonik): `CLAUDE.md` §15. Ringkasan naratif per fase: `hasil/gr
 
 *(Penghitungan ByteTrack RQ5 (bagian dari P9) menunggu video uji + `gt_<nama>.csv` + ambang A-02.)*
 
-## Hasil utama P7 (unit AP50-95 per kelas × strata, n=34)
+## Hasil utama FINAL (unit AP50-95 per kelas × strata, n=24 sel pasca-FASE 1)
 
-| Hipotesis utama | p | effect size | Kesimpulan |
-|---|---|---|---|
-| V8 − V1 (penuh vs baseline) | 0,478 | r=+0,143 | tidak signifikan |
-| V4 − V1 (DALW saja) | 0,469 | r=−0,144 (median −0,013) | tidak signifikan |
-| **V8 − V5** (DALW inkremental) | **0,0125** | **r=+0,486** | **SIGNIFIKAN** |
+| Hipotesis utama | p | effect size | Bootstrap CI 95% (poin persen) | Kesimpulan |
+|---|---|---|---|---|
+| H1: V8 − V1 (penuh vs baseline) | 0,565 | r=+0,140 | [+0,05; +2,08] *tak memuat nol* | Wilcoxon **tidak signifikan** (dua uji berbeda arah — laporkan keduanya) |
+| H2: V4 − V1 (DALW saja) | 0,208 | r=−0,300 | [−1,21; +1,00] memuat nol | **tidak didukung** (p besar, bukan nyaris) |
+| **H3: V8 − V5** (DALW inkremental) | **0,0367** | **r=+0,487** | **[+1,26; +3,53]** *tak memuat nol* | **SIGNIFIKAN — temuan terkokoh** |
+
+> ⚠️ **Angka di atas adalah hasil pasca-FASE 1** (ambang oklusi 0,40 + aturan sel-min-30 +
+> bootstrap CI, 24 sel). Angka P7 lama (p=0,478/0,469/0,0125 pada 34 sel) **sudah tidak
+> dipakai** — arah kesimpulan sama, tetapi selalu kutip angka pasca-FASE 1.
 
 Kesimpulan awal: **DALW komplementer/kondisional** atas HAM+P2, tidak berdiri sendiri. Global mAP50-95 test berhimpit 0,522–0,538. Detail & sekunder Holm: [Statistik](../knowledge/statistics.md). Memicu **A-01** ([Keputusan pending](pending-decisions.md)).
+
+
+## FASE 1, FASE 2, dan P9 (5 Agustus 2026)
+
+**FASE 1 — perbaikan metodologi + re-run.** `OCC_EDGES` 0,35→**0,40** (Tabel 3.6); aturan
+**sel minimum 30** objek GT (Subbab 3.11.5) → unit uji 34→**24 sel**, 12 dibuang & dilaporkan
+terpisah; **bootstrap CI 95 %** (1.000 resample tataran citra berpasangan, Subbab 3.11.5)
+ditambahkan. `test_eval.py` diperluas → **E1–E8 LULUS**. Arah kesimpulan tidak berubah.
+
+**FASE 2 — dua eksperimen sisa naskah, keduanya tuntas.**
+- *Sensitivitas α pada V4*: α=0,5 → 54,00 % test; α=1,0 → 53,66 %; **α=2,0 → 54,96 % test
+  (tertinggi dari 7 varian yang diuji, di atas V8 53,75 %)** sekaligus tetap **30,5 FPS**.
+  Mengonfirmasi empiris keterbatasan grid satu-titik (Subbab 3.9); α=1,0 tetap dipakai untuk
+  ablasi utama demi keadilan perbandingan.
+- *Ketegaran normalisasi-per-bobot*: V8_normw 53,62 % vs V8 53,75 % (selisih 0,13 poin,
+  Wilcoxon p=0,944) → **gain DALW bukan efek skala loss** (hasil yang menguntungkan klaim).
+
+**P9 — counting end-to-end (RQ5) SELESAI.** 3 klip × 10 interval × 3 kelas × 2 arah =
+**180 pengamatan**. **MAE 1,972 · RMSE 4,947 · MAPE 37,17 %** (68/180 y=0 dikecualikan) ·
+agregat **−23,9 %** · **FPS pipeline 20,47** (pakai angka ini untuk klaim *real-time*, bukan
+23,3 FPS model murni). Dua koreksi metodologis: (1) konvensi arah in/out diselaraskan
+("in" = menuju kiri-bawah) → MAPE klip 3 turun 54,79 %→**26,78 %**; (2) **klip 1 dikecualikan**
+karena segmen garisnya tak menjangkau lajur mobil (cacat validitas pengukuran, wajib
+dinyatakan eksplisit di BAB 4/5). Pola: MAE naik seiring kepadatan (0,72→1,05→4,15); roda dua
+paling andal (−9 %), kendaraan besar terlemah (0/21 pada klip terpadat).
+
+**Konsolidasi.** Seluruh bahan BAB 4–5 dirakit di **`hasil_bab4_5/`** (10 subfolder, generator
+idempoten `y26_bangun_hasil_bab45.py`) + peta placeholder abstrak di
+**`hasil_bab4_5/PETA_PLACEHOLDER_ABSTRAK.md`**. ⚠️ Temuan penting: kalimat hasil abstrak v7
+memprasyaratkan kenaikan signifikan atas baseline yang **tidak didukung** (mAP@0,5 V8 77,97 %
+< V1 78,61 %) → abstrak harus **ditulis ulang**, bukan diisi (keputusan A-01).
 
 ## Tautan terkait
 
