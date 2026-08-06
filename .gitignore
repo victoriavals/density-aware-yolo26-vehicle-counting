@@ -6,6 +6,13 @@ backups/
 counting_out/
 video_uji/*
 !video_uji/README.md
+# Hitung manual & konfigurasi garis WAJIB ter-track: satu-satunya data pada proyek ini
+# yang tidak dapat dibangkitkan ulang oleh kode (insiden timpa 5 Agu 2026, lihat
+# hasil_bab4_5/K7_PENGHITUNG_KEDUA.md §6). Ukurannya hanya beberapa kilobita.
+!video_uji/gt_*.csv
+!video_uji/konfigurasi_garis.json
+!video_uji/penghitung_kedua/
+!video_uji/penghitung_kedua/*.csv
 dataset/
 dataset_raw/
 *.zip
