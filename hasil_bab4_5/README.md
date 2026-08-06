@@ -1,13 +1,25 @@
 # Hasil Eksperimen untuk BAB 4 & BAB 5
 
-> **Status per 5 Agustus 2026.** Folder ini merangkum SEMUA data, tabel, dan visualisasi
-> yang menjadi bahan penulisan BAB 4 (Hasil dan Pembahasan) dan BAB 5 (Kesimpulan dan
-> Saran), diambil langsung dari sumber kebenaran (`eval_out/`, `nmsfree_out/`, `runs_tesis/`,
-> `anotasi_oklusi/`, `dataset/`) — tidak ada angka yang diketik ulang secara manual.
-> **Belum ada placeholder di naskah tesis yang diisi dan BAB 4–5 belum ditulis** — folder
-> ini adalah *bahan mentah terorganisasi*, bukan draf bab.
+> **Status per 6 Agustus 2026.** Folder ini memuat SELURUH data, tabel, dan visualisasi
+> hasil penelitian, diambil langsung dari sumber kebenaran (`eval_out/`, `nmsfree_out/`,
+> `counting_out/`, `runs_tesis/`, `video_uji/`, `anotasi_oklusi/`, `dataset/`) — tidak ada
+> angka yang diketik ulang secara manual.
+>
+> **BAB IV dan BAB V sudah ditulis** dan naskahnya ada di [`14_naskah/`](14_naskah/)
+> (`TESIS_BAB4-5.docx`, 15 tabel, 24 gambar, 13 lampiran). Naskah tersebut dibangkitkan
+> program dari data di folder ini, sehingga dapat dibangun ulang bila ada data yang berubah.
+> Placeholder pada abstrak BAB 1–3 **belum diisi** karena menunggu penempelan manual ke
+> naskah utama — redaksi siap tempelnya ada di [`K4_REDAKSI_HASIL.md`](K4_REDAKSI_HASIL.md).
 
 ## Cara memakai folder ini
+
+> **Folder ini adalah satu-satunya tempat yang perlu dibuka.** Seluruh data dan
+> visualisasi hasil penelitian sudah dikonsolidasikan ke sini (165 berkas, ±12 MB),
+> termasuk data mentah yang tak dapat dibangkitkan ulang (folder `00_data_sumber/`)
+> dan naskah jadinya (`14_naskah/`). Sumber aslinya di `eval_out/`, `nmsfree_out/`,
+> `counting_out/`, `runs_tesis/`, dan `video_uji/` tetap ada dan tidak dihapus —
+> folder ini turunan, bukan pengganti. Konsolidasi diulang otomatis lewat
+> `konsolidasi_arsip()` pada `y26_bangun_hasil_bab45.py`.
 
 Tiap subfolder `0N_<topik>/` punya `README.md` sendiri yang menjelaskan **setiap file**:
 apa isinya, bagaimana dibaca, dan kalimat interpretasi yang bisa langsung diadaptasi untuk
@@ -16,6 +28,7 @@ lanjut atau disalin ke Word/Excel.
 
 | # | Folder | Menjawab | Status |
 |---|---|---|---|
+| 00 | [data_sumber](00_data_sumber/) | **Data mentah yang TIDAK dapat dibangkitkan ulang kode**: hitung manual 4 klip, konfigurasi garis maya, kit penghitung kedua, anotasi oklusi manual, bukti split, `dalw_best.json` | ✅ lengkap |
 | 01 | [dataset](01_dataset/) | Subbab 3.3 — karakteristik & pembagian data | ✅ lengkap |
 | 02 | [grid_search_dalw](02_grid_search_dalw/) | Subbab 3.9 — pencarian α, σ | ✅ lengkap |
 | 03 | [kompleksitas_model](03_kompleksitas_model/) | Subbab 3.11.4 — Tabel 3.7 | ✅ lengkap |
@@ -27,6 +40,9 @@ lanjut atau disalin ke Word/Excel.
 | 09 | [counting_end_to_end](09_counting_end_to_end/) | RQ5 — penghitungan ByteTrack | ✅ hasil 3 klip (GT 1 penghitung — K7) |
 | 10 | [multi_seed](10_multi_seed/) | Tabel 3.9 — validitas internal | ✅ **K6: tidak dijalankan** — kalimat keterbatasan siap pakai |
 | 11 | [analisis_galat](11_analisis_galat/) | Subbab 4.11 — matriks kekeliruan uji, FP/FN per strata, kasus gagal | ✅ **baru 5 Agu 2026** |
+| 12 | [kurva_pelatihan](12_kurva_pelatihan/) | Kurva pelatihan, `results.csv`, probe NMS-free per epoch, dan catatan kompleksitas untuk **11 run** (V1–V8, V4_a0.5, V4_a2.0, V8_normw) | ✅ lengkap |
+| 13 | [ringkasan_naratif](13_ringkasan_naratif/) | Ringkasan naratif per tahap: grid search, catatan run, evaluasi, validasi oklusi | ✅ lengkap |
+| 14 | [naskah](14_naskah/) | **`TESIS_BAB4-5.docx`** — naskah BAB IV & V beserta 13 lampiran | ✅ lengkap |
 
 ---
 
