@@ -81,7 +81,7 @@ Karena desainnya *full factorial*, tiap pasangan varian yang berbeda pada satu s
 
 Tiga pasangan utama (V8–V1, V4–V1, V8–V5) diuji tanpa koreksi; sisanya sekunder dengan koreksi Holm. Unit uji Wilcoxon = **AP per (kelas × strata)**, tanpa baris global. Rincian protokol di [statistik](../knowledge/statistics.md).
 
-**Hasil P7 (18 Jul 2026)** untuk konteks — jangan salin sebagai placeholder tesis (belum dituangkan ke naskah): V4−V1 **tidak signifikan** (p=0,469; median −0,013), V8−V1 **tidak signifikan** (p=0,478), V8−V5 **signifikan** (p=0,0125; r=+0,486). Kesimpulan awal: DALW bersifat **komplementer/kondisional** atas HAM+P2, bukan berdiri sendiri. Ini memicu keputusan pending A-01 — lihat [keputusan pending](../status/pending-decisions.md) dan [progress](../status/progress.md).
+**Hasil final (pasca-FASE 1, 5 Agu 2026)** untuk konteks — jangan salin sebagai placeholder tesis (belum dituangkan ke naskah): H2 V4−V1 **tidak didukung** (p=0,208; r=−0,300; median −0,0133), H1 V8−V1 **tidak signifikan** menurut Wilcoxon (p=0,565) meski selang bootstrap tak memuat nol, H3 V8−V5 **signifikan** (p=0,0367; r=+0,487). Kesimpulan awal: DALW bersifat **komplementer/kondisional** atas HAM+P2, bukan berdiri sendiri. Ini memicu keputusan pending A-01 — lihat [keputusan pending](../status/pending-decisions.md) dan [progress](../status/progress.md).
 
 ## Invarian keadilan ablasi (WAJIB)
 
