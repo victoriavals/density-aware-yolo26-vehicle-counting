@@ -30,7 +30,7 @@ Gaya bahasa harus terbaca alami dan manusiawi untuk menghindari pola khas hasil 
 
 ## Angka desimal: naskah vs kode
 
-Di narasi naskah semua desimal memakai koma: mAP@0,5:0,95 = 0,6670, α = 1,0, σ = 0,1, τ = 0,25, p = 0,0125, r = +0,486. Nilai yang berasal dari berkas JSON, argumen CLI, atau keluaran skrip ditulis apa adanya dengan titik saat merujuk artefak teknis (mis. `dalw_best.json` berisi `0.6670`, flag `--tune-epochs 60`). Bila menyandingkan keduanya, jelaskan bahwa itu nilai yang sama dalam dua konvensi penulisan.
+Di narasi naskah semua desimal memakai koma: mAP@0,5:0,95 = 0,6670, α = 1,0, σ = 0,1, τ = 0,25, p = 0,0367, r = +0,487. Nilai yang berasal dari berkas JSON, argumen CLI, atau keluaran skrip ditulis apa adanya dengan titik saat merujuk artefak teknis (mis. `dalw_best.json` berisi `0.6670`, flag `--tune-epochs 60`). Bila menyandingkan keduanya, jelaskan bahwa itu nilai yang sama dalam dua konvensi penulisan.
 
 ## Konsistensi framing (wajib, lihat aturan NEVER)
 
