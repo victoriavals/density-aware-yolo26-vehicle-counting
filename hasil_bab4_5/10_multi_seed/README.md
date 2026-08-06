@@ -1,58 +1,74 @@
 # 10 — Pengulangan Multi-Seed (Validitas Internal, Tabel 3.9)
 
-## ⏸️ STATUS: BELUM DIPUTUSKAN (Keputusan K6, menunggu Naufal + pembimbing)
+## ✅ KEPUTUSAN K6 DIAMBIL (5 Agustus 2026): **TIDAK dijalankan — keterbatasan dinyatakan eksplisit**
 
-## Latar Belakang
+Naufal memutuskan tidak menjalankan pengulangan multi-seed karena **anggaran waktu komputasi
+tidak memungkinkan** (estimasi ~49 jam GPU tambahan). Naskah v7 Tabel 3.9 secara eksplisit
+menyediakan jalan keluar ini:
 
-Naskah v7 Tabel 3.9 (Ancaman terhadap Validitas Internal) menjanjikan:
+> "...pengulangan sekurang-kurangnya tiga seed pada empat varian kunci [V1, V4, V5, V8],
+> **sepanjang anggaran komputasi memungkinkan**; apabila pengulangan tidak dapat
+> dituntaskan, keterbatasan tersebut **dinyatakan secara eksplisit pada BAB IV**."
 
-> "...pengulangan sekurang-kurangnya tiga seed pada empat varian kunci [V1, V4, V5,
-> V8], **sepanjang anggaran komputasi memungkinkan**; apabila pengulangan tidak dapat
-> dituntaskan, keterbatasan tersebut dinyatakan secara eksplisit pada BAB IV."
+Jadi keputusan ini **sah menurut protokol naskah sendiri** — bukan penyimpangan. Yang wajib
+dipenuhi hanyalah kewajiban menyatakannya terbuka di BAB IV dan BAB V.
 
-Naskah sendiri menyediakan **jalan keluar yang sah** bila tidak dijalankan — ini bukan
-kewajiban mutlak, tapi keputusan biaya-manfaat yang harus diambil sadar oleh Naufal
-bersama pembimbing.
+## Dasar estimasi biaya yang menjadi alasan penolakan
 
-## Dua Opsi
+Dihitung dari waktu latih aktual P5 (`../03_kompleksitas_model/tabel_kompleksitas.csv`):
 
-### Opsi A — Jalankan multi-seed
+| Varian | Jam/seed | 2 seed tambahan |
+|---|---|---|
+| V1 | 1,58 | 3,2 jam |
+| V4 | 1,40 | 2,8 jam |
+| V5 | 10,24 | 20,5 jam |
+| V8 | 11,47 | 22,9 jam |
+| **Total** | | **≈49 jam GPU** |
 
-Latih V1, V4, V5, V8 masing-masing pada ≥3 seed berbeda (`--seed` sudah didukung
-`train_ablation.py` melalui parameter `seed=0` di `model.train()` — perlu ditambah
-sebagai argumen CLI bila belum ada), laporkan simpangan baku & rentang mAP50-95 per
-varian.
+Varian ber-P2 (V5, V8) mendominasi biaya karena *head* deteksi beresolusi tinggi
+(stride 4) menghasilkan sekitar empat kali jumlah titik *anchor*.
 
-**Estimasi biaya** (berdasarkan waktu latih aktual P5, `03_kompleksitas_model/tabel_kompleksitas.csv`):
-- V1: ~1,6 jam/seed × 2 seed tambahan = ~3,2 jam
-- V4: ~1,4 jam/seed × 2 = ~2,8 jam
-- V5: ~10,2 jam/seed × 2 = ~20,4 jam
-- V8: ~11,5 jam/seed × 2 = ~23,0 jam
-- **Total tambahan: ~49 jam GPU** (varian ber-P2 mendominasi biaya)
+## Kalimat siap-pakai untuk BAB IV (keterbatasan)
 
-Prioritaskan **V4 dan V8** bila anggaran terbatas — keduanya penyangga klaim
-kebaruan (H2 dan H3).
+> "Pengulangan pelatihan pada beberapa nilai *seed* acak sebagaimana direncanakan pada
+> Tabel 3.9 tidak dapat dituntaskan mengingat keterbatasan anggaran komputasi pada
+> perangkat tunggal berkapasitas memori 8 gigabyte. Estimasi kebutuhan tambahan mencapai
+> sekitar empat puluh sembilan jam komputasi GPU, terutama disebabkan oleh varian yang
+> memuat Lapisan Deteksi P2 yang masing-masing memerlukan sepuluh hingga sebelas jam
+> pelatihan per pengulangan. Dengan demikian, seluruh hasil yang dilaporkan pada bab ini
+> merepresentasikan satu realisasi pelatihan dengan *seed* tetap bernilai nol untuk setiap
+> varian, sebagaimana dicantumkan pada Tabel 3.4."
 
-### Opsi B — Nyatakan keterbatasan eksplisit
+## Kalimat siap-pakai untuk BAB V (implikasi & saran)
 
-Tulis di BAB 4/5 (kalimat siap-adaptasi, sesuai izin naskah sendiri):
+> "Keterbatasan berupa tidak tersedianya pengulangan multi-*seed* perlu diperhatikan dalam
+> menafsirkan perbandingan antarvarian yang selisihnya kecil, khususnya hipotesis pertama
+> dan kedua yang tidak menunjukkan perbedaan signifikan. Variabilitas akibat inisialisasi
+> acak dan urutan pengacakan data tidak terkuantifikasi pada penelitian ini, sehingga tidak
+> dapat dipastikan apakah selisih kecil yang teramati berada di dalam atau di luar rentang
+> fluktuasi antar-*seed*. Penelitian lanjutan disarankan menjalankan sekurang-kurangnya tiga
+> pengulangan pada varian kunci dan melaporkan simpangan bakunya, sehingga kesimpulan
+> mengenai kontribusi masing-masing komponen dapat diperkuat secara statistik."
 
-> "Pengulangan pada beberapa nilai seed acak tidak dapat dituntaskan mengingat
-> keterbatasan anggaran komputasi pada perangkat tunggal GPU 8GB, sehingga hasil
-> yang dilaporkan merepresentasikan satu realisasi pelatihan (seed=0) untuk setiap
-> varian. Keterbatasan ini berpotensi memengaruhi generalisasi temuan, khususnya pada
-> perbandingan dengan selisih performa kecil seperti hipotesis H1 dan H2."
+## ⚠️ Kaitan dengan penafsiran hasil BAB 4
 
-## Rekomendasi
+Keterbatasan ini **paling relevan untuk H1 dan H2** (`../04_ablasi_deteksi/`), yang
+selisihnya kecil dan tidak signifikan:
 
-Mengingat FASE 1 & FASE 2 (sensitivitas α, ketegaran normalisasi) sudah memakan
-signifikan waktu GPU, dan masih ada P9 (counting) yang menunggu, **Opsi B lebih
-realistis** kecuali Naufal punya kelonggaran waktu >2 hari GPU tambahan sebelum
-tenggat. Keputusan akhir tetap milik Naufal + pembimbing.
+- **H1 (V8 vs V1)**: selisih mAP hanya +1,02 poin persen, dengan batas bawah selang
+  bootstrap +0,05 — sangat tipis. Tanpa data multi-seed, tidak dapat dipastikan apakah
+  selisih sekecil ini melampaui fluktuasi antar-*seed*.
+- **H2 (V4 vs V1)**: selisih −0,17 poin persen, praktis nol.
+- **H3 (V8 vs V5)** relatif lebih aman: selisih +2,29 poin persen dengan selang bootstrap
+  [+1,26; +3,53] yang jelas menjauhi nol, sehingga kesimpulannya lebih tahan terhadap
+  ketidakpastian antar-*seed* — meski tetap tidak sepenuhnya bebas dari keterbatasan ini.
 
-## Setelah Diputuskan
+Rumusan yang disarankan: sebut keterbatasan ini **berdampingan** dengan pembahasan H1/H2,
+bukan disembunyikan di akhir bab, agar pembaca dapat menilai kekuatan bukti secara adil.
 
-- **Bila Opsi A**: folder ini akan diisi `tabel_multiseed.csv` (mAP per seed per
-  varian) + `grafik_multiseed_errorbar.png` (mAP ± simpangan baku).
-- **Bila Opsi B**: tidak ada artefak baru; cukup kalimat keterbatasan di atas dimasukkan
-  ke BAB 4/5, dan folder ini bisa dihapus atau dibiarkan sebagai catatan keputusan.
+## Tidak ada artefak data di folder ini
+
+Karena pengulangan tidak dijalankan, folder ini hanya memuat dokumentasi keputusan dan
+kalimat siap-pakai. Bila di masa depan multi-seed dijalankan, tambahkan `tabel_multiseed.csv`
+(mAP per seed per varian) dan `grafik_multiseed_errorbar.png` (mAP ± simpangan baku), lalu
+perbarui status di `../README.md`.
