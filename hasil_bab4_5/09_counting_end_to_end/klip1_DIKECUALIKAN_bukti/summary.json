@@ -1,0 +1,26 @@
+{
+  "video": "video_uji/1_vidiouji.mp4",
+  "frames": 18000,
+  "fps_video": 30.0,
+  "fps_model": 22.566396283751182,
+  "fps_pipeline": 19.899084746163407,
+  "line": [
+    1919,
+    839,
+    504,
+    1
+  ],
+  "interval_s": 60,
+  "totals": {
+    "two-wheeler_in": 122,
+    "two-wheeler_out": 157
+  },
+  "metrics": {
+    "T": 60,
+    "MAE": 2.0,
+    "RMSE": 3.366501646120693,
+    "MAPE": 60.33779881486415,
+    "mape_excluded": 22,
+    "mape_excluded_frac": 0.36666666666666664
+  }
+}
