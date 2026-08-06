@@ -25,7 +25,8 @@ lanjut atau disalin ke Word/Excel.
 | 07 | [ketegaran_normalisasi](07_ketegaran_normalisasi/) | Subbab 3.6.3 — pemeriksaan ketegaran | ✅ lengkap |
 | 08 | [validasi_oklusi](08_validasi_oklusi/) | Subbab 3.3.3 — validasi proksi oklusi | ✅ lengkap |
 | 09 | [counting_end_to_end](09_counting_end_to_end/) | RQ5 — penghitungan ByteTrack | ✅ hasil 3 klip (GT 1 penghitung — K7) |
-| 10 | [multi_seed](10_multi_seed/) | Tabel 3.9 — validitas internal | ⏸️ menunggu keputusan K6 |
+| 10 | [multi_seed](10_multi_seed/) | Tabel 3.9 — validitas internal | ✅ **K6: tidak dijalankan** — kalimat keterbatasan siap pakai |
+| 11 | [analisis_galat](11_analisis_galat/) | Subbab 4.11 — matriks kekeliruan uji, FP/FN per strata, kasus gagal | ✅ **baru 5 Agu 2026** |
 
 ---
 
@@ -140,11 +141,58 @@ Daftar ini bukan kegagalan — ini kejujuran ilmiah yang justru memperkuat kredi
    akhir memakai 3 klip / 180 pengamatan (protokol 3.10.1 tetap terpenuhi: ≥3 klip,
    masing-masing ≥10 menit, titik pengamatan berbeda).
 4c. **GT counting berasal dari satu penghitung**, sedangkan Subbab 3.10.1 menjanjikan dua
-   penghitung independen + pelaporan tingkat kesesuaian awal (keputusan **K7** terbuka).
-5. **Multi-seed (K6) belum dijalankan** — lihat folder 10.
+   penghitung independen + pelaporan tingkat kesesuaian awal (keputusan **K7b** terbuka).
+   Kit penghitung kedua **sudah siap pakai** di `video_uji/penghitung_kedua/` — protokol,
+   cadangan, dan redaksi revisi 3.10.1 ada di [K7_PENGHITUNG_KEDUA.md](K7_PENGHITUNG_KEDUA.md).
+5. **Multi-seed (K6) TIDAK dijalankan** — keputusan sadar 5 Agu 2026 karena anggaran waktu
+   (≈49 jam GPU tambahan); naskah Tabel 3.9 mengizinkan dengan syarat dinyatakan eksplisit.
+   Kalimat siap-pakai untuk BAB IV & V ada di `10_multi_seed/README.md`. **Paling relevan
+   untuk H1 & H2** yang selisihnya kecil — sebutkan berdampingan dengan pembahasan keduanya,
+   jangan disembunyikan di akhir bab.
 6. **Grid search DALW dilakukan pada pelatihan dipersingkat (60 epoch)** pada satu varian
    (V8) — bukan pada kedelapan varian penuh (keterbatasan biaya komputasi, diakui naskah
    Subbab 3.9).
+7. **Strata kepadatan ekstrem (*dense*) tidak dapat dinilai pada data uji deteksi.** Setelah
+   aturan sel minimum `MIN_CELL_GT=30` diterapkan, satu-satunya kelas yang lolos pada strata
+   ini adalah **pejalan kaki** (n=77) — kelas konteks yang justru dikecualikan dari
+   penghitungan; kelas kendaraan hanya bervolume 1, 11, dan 21 objek. Ini **manifestasi kedua**
+   dari keterbatasan yang sama dengan butir 4 (tier *dense* juga tak terwakili di klip
+   counting). Karena BAB 1 menjadikan kepadatan >25 objek/frame sebagai salah satu dari tiga
+   tantangan utama, keterbatasan ini wajib disebut terbuka. Bukti:
+   `04_ablasi_deteksi/delta_strata.csv`.
+8. **Tidak ada varian yang memenuhi kriteria *real-time* ≥30 FPS** ketika pelacakan dan
+   kepadatan nyata diperhitungkan (V8 19,29 FPS; V4_a2.0 23,20; V1 23,28 pada klip terpadat —
+   `counting_out/fps_probe/`). Judul tesis memuat kata *real-time*, sehingga ini wajib dijawab
+   terbuka, bukan didiamkan. Rincian & redaksi: [K5_AMBANG_RQ5.md](K5_AMBANG_RQ5.md).
+9. **Sekitar 59,5 % defisit penghitungan berasal dari dua sel klip 4** (mobil −170,
+   kendaraan besar −21) yang berpola sama dengan cacat geometri garis pada klip 1. Angka
+   agregat −23,9 % karena itu **bukan** murni akurasi deteksi/pelacakan, melainkan akurasi
+   sistem beserta penempatan garisnya. Pelaporan per kelas wajib.
+
+## Tiga dokumen keputusan (K4, K5, K7) — baca sebelum menulis BAB 4
+
+| Dokumen | Isi | Status |
+|---|---|---|
+| [K4_REDAKSI_HASIL.md](K4_REDAKSI_HASIL.md) | Definisi "konfigurasi terbaik", aturan pelaporan 3 hipotesis, **abstrak ditulis ulang (ID+EN) siap tempel**, daftar frasa terlarang | usulan — perlu ACC pembimbing |
+| [K5_AMBANG_RQ5.md](K5_AMBANG_RQ5.md) | Tiga ambang literatur nyata (Lewis 1982, FHWA TMG, literatur CV), kriteria FPS a-priori, dekomposisi defisit, redaksi RQ5 deskriptif | usulan — perlu ACC pembimbing |
+| [K7_PENGHITUNG_KEDUA.md](K7_PENGHITUNG_KEDUA.md) | Protokol penghitung kedua + kit siap pakai, cadangan *test-retest*, redaksi revisi Subbab 3.10.1 | kit siap — tinggal dijalankan |
+
+## Kelengkapan bahan per subbab BAB 4
+
+| Subbab | Bahan | Status |
+|---|---|---|
+| 4.1 Dataset & distribusi kelas | `01_dataset/` | ✅ |
+| 4.2 Inisialisasi & transfer bobot | `logs/smoke.log` | ✅ |
+| 4.3 Grid search α,σ | `02_grid_search_dalw/` | ✅ |
+| 4.4 Metrik global per varian | `04_ablasi_deteksi/global_metrics.csv` | ✅ |
+| 4.5 Ablasi terstratifikasi + Wilcoxon | `04_ablasi_deteksi/` (+ `delta_strata.csv`) | ✅ |
+| 4.6 Sensitivitas α + ketegaran | `06_`, `07_` | ✅ |
+| 4.7 Kompleksitas & efisiensi | `03_kompleksitas_model/` | ✅ |
+| 4.8 Analisis NMS-free (DR/CM/τ/S(t)) | `05_analisis_nmsfree/` | ✅ |
+| 4.9 Validasi proksi oklusi | `08_validasi_oklusi/` | ✅ |
+| 4.10 Penghitungan end-to-end | `09_counting_end_to_end/` | ✅ |
+| **4.11 Analisis galat** | **`11_analisis_galat/`** | ✅ **baru (5 Agu 2026)** |
+| Keterbatasan multi-seed | `10_multi_seed/` | ✅ (kalimat siap pakai) |
 
 ## Referensi cepat: sumber data mentah (jangan dihapus)
 
