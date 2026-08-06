@@ -1,0 +1,28 @@
+varian,dim,stratum,n_gt,n_fn,fn_persen,n_salah_kelas,n_fp_prediksi,catatan
+V1,size,small,1192,389,32.63,20,553,
+V1,size,medium,1168,204,17.47,32,325,
+V1,size,large,240,21,8.75,2,21,
+V1,occlusion,no,2278,509,22.34,46,,FP tak dapat distratifikasi (proksi oklusi butuh pasangan GT)
+V1,occlusion,partial,318,104,32.7,8,,FP tak dapat distratifikasi (proksi oklusi butuh pasangan GT)
+V1,occlusion,heavy,4,1,25.0,0,,FP tak dapat distratifikasi (proksi oklusi butuh pasangan GT)
+V1,density,sparse,647,100,15.46,22,221,
+V1,density,medium,1843,483,26.21,29,624,
+V1,density,dense,110,31,28.18,3,54,
+V5,size,small,1192,347,29.11,23,721,
+V5,size,medium,1168,158,13.53,33,383,
+V5,size,large,240,19,7.92,6,30,
+V5,occlusion,no,2278,429,18.83,52,,FP tak dapat distratifikasi (proksi oklusi butuh pasangan GT)
+V5,occlusion,partial,318,94,29.56,10,,FP tak dapat distratifikasi (proksi oklusi butuh pasangan GT)
+V5,occlusion,heavy,4,1,25.0,0,,FP tak dapat distratifikasi (proksi oklusi butuh pasangan GT)
+V5,density,sparse,647,107,16.54,20,307,
+V5,density,medium,1843,397,21.54,38,774,
+V5,density,dense,110,20,18.18,4,53,
+V8,size,small,1192,352,29.53,17,638,
+V8,size,medium,1168,179,15.33,50,309,
+V8,size,large,240,10,4.17,10,27,
+V8,occlusion,no,2278,450,19.75,70,,FP tak dapat distratifikasi (proksi oklusi butuh pasangan GT)
+V8,occlusion,partial,318,90,28.3,7,,FP tak dapat distratifikasi (proksi oklusi butuh pasangan GT)
+V8,occlusion,heavy,4,1,25.0,0,,FP tak dapat distratifikasi (proksi oklusi butuh pasangan GT)
+V8,density,sparse,647,95,14.68,21,222,
+V8,density,medium,1843,417,22.63,54,696,
+V8,density,dense,110,29,26.36,2,56,
