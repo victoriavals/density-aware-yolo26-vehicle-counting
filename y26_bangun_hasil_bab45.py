@@ -838,6 +838,72 @@ def bab_11_analisis_galat(variants=("V1", "V5", "V8")):
     return {"fn_total": total_fn, "kasus_terburuk": ringkas}
 
 
+# ======================================================================
+# KONSOLIDASI — kumpulkan SELURUH data & visualisasi ke satu tempat
+# ======================================================================
+# Tujuan: hasil_bab4_5/ menjadi satu-satunya folder yang perlu dibuka/diserahkan.
+# Artefak yang tersebar (counting_out, nmsfree_out, runs_tesis, hasil/, video_uji)
+# disalin ke sini. Sumber aslinya TIDAK dihapus - folder ini turunan, bukan pengganti.
+def _salin(src: Path, dst: Path) -> int:
+    if not src.exists():
+        return 0
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(src, dst)
+    return 1
+
+
+def konsolidasi_arsip():
+    n = 0
+
+    # -- 00 data sumber yang tidak dapat dibangkitkan ulang oleh kode --------
+    d = OUT / "00_data_sumber"; d.mkdir(parents=True, exist_ok=True)
+    for f in sorted((ROOT / "video_uji").glob("gt_*.csv")):
+        n += _salin(f, d / "hitung_manual" / f.name)
+    n += _salin(ROOT / "video_uji/konfigurasi_garis.json", d / "konfigurasi_garis.json")
+    n += _salin(ROOT / "video_uji/README.md", d / "PANDUAN_VIDEO_UJI.md")
+    for f in sorted((ROOT / "video_uji/penghitung_kedua").glob("*")):
+        if f.is_file():
+            n += _salin(f, d / "kit_penghitung_kedua" / f.name)
+    n += _salin(ROOT / "anotasi_oklusi/manual_oklusi.csv", d / "anotasi_oklusi_manual.csv")
+    n += _salin(ROOT / "bukti_split_grup.csv", d / "bukti_split_grup.csv")
+    n += _salin(ROOT / "bukti_split_citra.csv", d / "bukti_split_citra.csv")
+    n += _salin(ROOT / "dalw_best.json", d / "dalw_best.json")
+
+    # -- 05 lengkapi keluaran mentah analisis NMS-free -----------------------
+    for f in sorted((ROOT / "nmsfree_out").glob("*")):
+        if f.is_file() and not (OUT / "05_analisis_nmsfree" / f.name).exists():
+            n += _salin(f, OUT / "05_analisis_nmsfree" / f.name)
+
+    # -- 09 lengkapi counting: pengukuran FPS + klip 1 (bukti pengecualian) --
+    d9 = OUT / "09_counting_end_to_end"
+    for v in ("V1", "V4_a2.0", "V8"):
+        n += _salin(ROOT / f"counting_out/fps_probe/{v}/summary.json",
+                    d9 / "pengukuran_fps" / f"{v}_summary.json")
+    for f in ("counting_errors.csv", "counts_per_interval.csv", "summary.json"):
+        n += _salin(ROOT / f"counting_out/1_vidiouji/{f}",
+                    d9 / "klip1_DIKECUALIKAN_bukti" / f)
+
+    # -- 12 kurva pelatihan per varian --------------------------------------
+    d12 = OUT / "12_kurva_pelatihan"
+    for run in sorted((ROOT / "runs_tesis").glob("V*")):
+        if not run.is_dir():
+            continue
+        n += _salin(run / "results.csv", d12 / f"{run.name}_results.csv")
+        n += _salin(run / "results.png", d12 / f"{run.name}_kurva.png")
+        n += _salin(run / "nmsfree_probe.csv", d12 / f"{run.name}_nmsfree_probe.csv")
+        n += _salin(run / "complexity_train.json", d12 / f"{run.name}_complexity.json")
+
+    # -- 13 ringkasan naratif per tahap -------------------------------------
+    for f in sorted((ROOT / "hasil").glob("*.md")):
+        n += _salin(f, OUT / "13_ringkasan_naratif" / f.name)
+
+    # -- 14 naskah hasil ----------------------------------------------------
+    n += _salin(ROOT / "TESIS_BAB4-5.docx", OUT / "14_naskah/TESIS_BAB4-5.docx")
+
+    print(f"  {n} berkas dikonsolidasikan ke {OUT}/")
+    return n
+
+
 if __name__ == "__main__":
     print("01 dataset..."); bab_01_dataset()
     print("02 grid search..."); bab_02_grid()
@@ -851,4 +917,5 @@ if __name__ == "__main__":
     print("  agreement:", r8["agreement"])
     print("11 analisis galat..."); r11 = bab_11_analisis_galat()
     print("  ", r11["fn_total"])
+    print("konsolidasi arsip..."); konsolidasi_arsip()
     print("SELESAI")
