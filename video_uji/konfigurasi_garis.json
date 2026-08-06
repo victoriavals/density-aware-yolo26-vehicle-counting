@@ -1,0 +1,92 @@
+{
+  "_catatan": {
+    "konvensi_arah": "in = kendaraan bergerak menuju KIRI-BAWAH bingkai (definisi penghitung manual). Diwujudkan dengan membalik urutan titik garis pada --line, karena sv.LineZone menentukan in/out dari orientasi titik A->B. Diverifikasi empiris: garis asli menghasilkan car_out=15 pada klip 4, garis dibalik menghasilkan car_in=15 (tertukar tepat).",
+    "garis_dipakai": "koordinat yang diberikan ke y26_counting.py (orientasi dibalik)",
+    "garis_geometris": "koordinat asli pilihan peneliti; garis fisiknya IDENTIK, hanya urutan titik berbeda",
+    "interval": "10 interval x 60 detik per klip; video dipotong tepat 18.000 frame (600,0 dtk)",
+    "kelas_dihitung": "big-vehicle, car, two-wheeler (pejalan kaki dikecualikan, kelas konteks)",
+    "total_pengamatan": "3 klip x 10 interval x 3 kelas x 2 arah = 180 pasangan"
+  },
+  "_dikecualikan": {
+    "1_vidiouji": {
+      "alasan": "Segmen garis virtual (504,1,1919,839) berakhir pada y=839 sehingga TIDAK menjangkau lajur bawah yang dipakai mobil. Akibatnya hitung manual (mencakup lebar jalan penuh, 20 mobil/10 menit) dan keluaran sistem (0 mobil) mengukur populasi kendaraan yang BERBEDA. Ini cacat validitas pengukuran pada tahap penyiapan, BUKAN performa model.",
+      "bukti": "Diagnosis pelacakan 80 detik: 24 track mobil terbentuk, hanya 2 berpindah sisi garis, 0 event LineZone untuk kelas mobil. Uji pembanding: garis tegak lurus (1007,0,1528,1079) menangkap tepat 2 mobil = sama dengan hitung manual menit 1.",
+      "keputusan": "Dikecualikan dari evaluasi RQ5 atas keputusan peneliti (5 Agu 2026). Berkas mentah (video, GT, hasil counting) TETAP disimpan sebagai bukti; pengecualian ini WAJIB dinyatakan eksplisit di BAB 4 dan BAB 5.",
+      "artefak": [
+        "video_uji/1_vidiouji.mp4",
+        "video_uji/gt_1_vidiouji.csv",
+        "counting_out/1_vidiouji/",
+        "video_uji/preview/DIAG_klip1_mobil.jpg"
+      ]
+    }
+  },
+  "2_vidiouji": {
+    "berkas": "2_vidiouji.mp4",
+    "garis_dipakai": [
+      1919,
+      926,
+      119,
+      1
+    ],
+    "garis_geometris": [
+      119,
+      1,
+      1919,
+      926
+    ],
+    "resolusi": "1920x1080",
+    "fps": 30.0,
+    "durasi_detik": 600.0,
+    "n_frame": 18000,
+    "n_interval": 10,
+    "interval_detik": 60,
+    "gt": "gt_2_vidiouji.csv",
+    "sumber_asli": "asli/2_vidiouji.mp4"
+  },
+  "3_vidiouji": {
+    "berkas": "3_vidiouji.mp4",
+    "garis_dipakai": [
+      1280,
+      668,
+      0,
+      317
+    ],
+    "garis_geometris": [
+      0,
+      317,
+      1280,
+      668
+    ],
+    "resolusi": "1280x720",
+    "fps": 30.0,
+    "durasi_detik": 600.0,
+    "n_frame": 18000,
+    "n_interval": 10,
+    "interval_detik": 60,
+    "gt": "gt_3_vidiouji.csv",
+    "sumber_asli": "asli/3_vidiouji.mp4"
+  },
+  "4_vidiouji": {
+    "berkas": "4_vidiouji.mp4",
+    "garis_dipakai": [
+      1919,
+      784,
+      348,
+      739
+    ],
+    "garis_geometris": [
+      348,
+      739,
+      1919,
+      784
+    ],
+    "resolusi": "1920x1080",
+    "fps": 30.0,
+    "durasi_detik": 600.0,
+    "n_frame": 18000,
+    "n_interval": 10,
+    "interval_detik": 60,
+    "gt": "gt_4_vidiouji.csv",
+    "sumber_asli": "asli/4_vidiouji.mp4"
+  }
+}
