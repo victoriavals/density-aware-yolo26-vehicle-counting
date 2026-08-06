@@ -75,9 +75,9 @@ Evaluasi terstratifikasi P7 (AP50-95 per kelas × strata, unit uji Wilcoxon; lih
 
 | Hipotesis utama | Makna | Hasil | Interpretasi |
 |---|---|---|---|
-| **V4 − V1** | DALW saja vs baseline | p = 0,469 (median −0,013) | **tidak signifikan** — DALW sendirian tidak cukup |
-| **V8 − V5** | model penuh vs HAM+P2 | p = 0,0125; r = +0,486 | **SIGNIFIKAN** — DALW menambah nilai *di atas* HAM+P2 |
-| V8 − V1 | model penuh vs baseline | p = 0,478 | tidak signifikan (efek gabungan belum lolos) |
+| **H2: V4 − V1** | DALW saja vs baseline | p = 0,208; r = −0,300 | **tidak didukung** — DALW sendirian tidak cukup (p besar, efek negatif) |
+| **H3: V8 − V5** | model penuh vs HAM+P2 | p = 0,0367; r = +0,487; CI [+1,26; +3,53] pp | **SIGNIFIKAN** — DALW menambah nilai *di atas* HAM+P2 (temuan terkokoh) |
+| H1: V8 − V1 | model penuh vs baseline | p = 0,565; CI [+0,05; +2,08] pp | Wilcoxon tidak signifikan, bootstrap tak memuat nol — **laporkan keduanya** |
 
 Kesimpulan yang diframe untuk BAB 4: DALW memberi manfaat **saat digabung** dengan tulang punggung yang lebih kuat (HAM+P2) — strata yang terbantu pada V8−V5: objek *small* +0,062, oklusi *partial* +0,053, densitas *sparse* +0,066. Ini **memicu keputusan A-01** (redaksi/alternatif abstrak bila hasil tak signifikan — lihat [Keputusan pending](../status/pending-decisions.md)). ⚠️ Placeholder BAB 4 BELUM diisi; jangan menulis draf BAB 4–5 di KB (aturan NEVER — CLAUDE.md §12).
 
