@@ -340,6 +340,12 @@ def main() -> None:
     ap.add_argument("--line", default=None, help="x1,y1,x2,y2 piksel; default garis tengah")
     ap.add_argument("--interval-s", type=int, default=60)
     ap.add_argument("--make-gt-template", action="store_true")
+    ap.add_argument("--gt-out", default=None,
+                    help="tujuan template GT (folder atau berkas). Default: di samping video. "
+                         "Pakai ini untuk template penghitung kedua.")
+    ap.add_argument("--timpa-gt", action="store_true",
+                    help="izinkan menimpa berkas GT yang SUDAH berisi hitung manual "
+                         "(bahaya: data hitung manual tidak dapat dibangkitkan ulang)")
     ap.add_argument("--out-dir", default="video_uji/preview")
     a = ap.parse_args()
 
@@ -384,7 +390,25 @@ def main() -> None:
 
     if a.make_gt_template:
         kelas = kelas_counting(a.data)
+        # Default tetap di samping video (sesuai video_uji/README.md). --gt-out dipakai
+        # untuk template penghitung kedua agar tak pernah mendarat di jalur penghitung
+        # pertama; boleh berupa folder atau nama berkas.
         gt = video.with_name(f"gt_{video.stem}.csv")
+        if a.gt_out:
+            p = Path(a.gt_out)
+            gt = (p / f"gt_{video.stem}.csv") if (p.is_dir() or not p.suffix) else p
+        gt.parent.mkdir(parents=True, exist_ok=True)
+        # PENJAGA: hitung manual adalah data yang tak dapat dibangkitkan ulang. Menimpanya
+        # dengan template nol pernah terjadi (5 Agu 2026) dan hanya selamat karena kolom y
+        # counting_errors.csv menyimpan salinannya. Jangan pernah menimpa diam-diam.
+        if gt.exists():
+            terisi = sum(int(r["count"] or 0)
+                         for r in csv.DictReader(open(gt, encoding="utf-8")))
+            if terisi > 0 and not a.timpa_gt:
+                raise SystemExit(
+                    f"  [BATAL] {gt} sudah berisi hitung manual (total {terisi} perlintasan).\n"
+                    f"          Menulis template akan MENGHAPUSNYA. Gunakan --gt-out lain,\n"
+                    f"          atau --timpa-gt bila memang ingin menimpa.")
         n = buat_template_gt(video, info, a.interval_s, kelas, gt)
         print(f"  template GT: {gt}  ({n} interval × {len(kelas)} kelas × 2 arah "
               f"= {n*len(kelas)*2} baris, count=0 — isi manual)")
