@@ -35,7 +35,7 @@ Ketiga dimensi diturunkan dari *bounding box ground truth* di ruang *letterbox* 
 | Dimensi | Ukuran atribut | Ambang (konstanta kode) | Tier (narasi) |
 |---|---|---|---|
 | Ukuran | luas kotak, konvensi MS COCO | `SIZE_EDGES = (32², 96²)` = (1024, 9216) px² | small < 32² ≤ medium < 96² ≤ large |
-| Oklusi | proksi Pers. 3.1: oᵢ = maxⱼ≠ᵢ IoU(bᵢ, bⱼ) | `OCC_EDGES = (0.10, 0.35)` | no < 0,10 ≤ partial < 0,35 ≤ heavy |
+| Oklusi | proksi Pers. 3.1: oᵢ = maxⱼ≠ᵢ IoU(bᵢ, bⱼ) | `OCC_EDGES = (0.10, 0.40)` (FASE 1: 0,35 → 0,40, selaras Tabel 3.6 naskah v7) | no < 0,10 ≤ partial < 0,40 ≤ heavy |
 | Densitas | jumlah objek per citra | `DEN_EDGES = (10, 26)` | sparse < 10 ≤ medium < 26 ≤ dense |
 
 Catatan implementasi: tier dihitung via `np.digitize(x, edges)` → {0,1,2}. Oklusi memakai `box_iou` Ultralytics dengan diagonal dinolkan lalu `iou.max(1)` per citra (persis Pers. 3.1). Ambang densitas 26 selaras narasi BAB 1 (">25 objek per frame"); ambang oklusi 0,10/0,35 adalah keputusan implementasi yang wajib dilaporkan di BAB 3/4.
