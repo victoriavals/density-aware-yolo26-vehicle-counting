@@ -1,6 +1,6 @@
 # Uji Statistik: Wilcoxon + Holm + Rank-Biserial — Statistical testing protocol
 
-> **EN — TL;DR:** Paired Wilcoxon signed-rank test on AP-per-(class × stratum) cells (never the global row); three PRIMARY hypotheses (V8−V1, V4−V1, V8−V5) at α = 5% with no correction, all other pairs SECONDARY under Holm step-down. Effect size is rank-biserial r = (W⁺ − W⁻)/(W⁺ + W⁻) (Eq. 3.15), `zero_method="wilcox"`. Actual P7 result: V8−V1 and V4−V1 not significant, **V8−V5 p = 0,0125, r = +0,486 significant** → DALW is complementary/conditional, not standalone; this triggers decision A-01.
+> **EN — TL;DR:** Paired Wilcoxon signed-rank test on AP-per-(class × stratum) cells (never the global row); three PRIMARY hypotheses (V8−V1, V4−V1, V8−V5) at α = 5% with no correction, all other pairs SECONDARY under Holm step-down. Effect size is rank-biserial r = (W⁺ − W⁻)/(W⁺ + W⁻) (Eq. 3.15), `zero_method="wilcox"`. Final result (post-FASE 1, 24 cells after the n_gt<30 rule): H1 V8−V1 p=0,565 and H2 V4−V1 p=0,208 not significant, **H3 V8−V5 p = 0,0367, r = +0,487 significant** → DALW is complementary/conditional, not standalone; this triggers decision A-01. A **95 % paired image-level bootstrap CI** (1.000 resamples) accompanies each primary pair and, for H1, excludes zero even though Wilcoxon does not — report BOTH, they answer different questions.
 
 Modul: `y26_stats.py` (Subbab 3.11.4–3.11.5). Diuji oleh `test_eval.py` E4. Semua angka hasil di halaman ini berasal dari eksekusi P7 (`eval_out/wilcoxon_ap5095.csv`); ringkasan naratifnya di `hasil/ringkasan_evaluasi.md`.
 
@@ -8,7 +8,7 @@ Modul: `y26_stats.py` (Subbab 3.11.4–3.11.5). Diuji oleh `test_eval.py` E4. Se
 
 Unit pasangan Wilcoxon untuk perbandingan deteksi adalah **nilai AP per kombinasi (kelas × dimensi strata × tier strata)**, bukan angka mAP global agregat. Alasannya metodologis: mAP global antarvarian berhimpit rapat (test mAP50-95 hanya berkisar 0,522–0,538), sehingga rata-rata agregat menutupi kantong-kantong sulit; uji per-sel jauh lebih sensitif terhadap ukuran kecil, oklusi, dan densitas tinggi yang justru menjadi target penelitian.
 
-Penyejajaran sel dilakukan `paired_vectors(rows_a, rows_b, metric, include_global=False)`. Kunci sel adalah `(r["cls"], r["dim"], r["stratum"])`; hanya sel yang **ada di kedua varian** yang dipasangkan. Parameter `include_global=False` (default) **membuang baris `dim == "global"`** agar unit murni strata — ini invarian metodologis yang tidak boleh dilonggarkan (lihat [Invarian metodologi](../rules/methodology-invariants.md)). Pada P7 ini menghasilkan **n = 34 sel** per pasangan.
+Penyejajaran sel dilakukan `paired_vectors(rows_a, rows_b, metric, include_global=False)`. Kunci sel adalah `(r["cls"], r["dim"], r["stratum"])`; hanya sel yang **ada di kedua varian** yang dipasangkan. Parameter `include_global=False` (default) **membuang baris `dim == "global"`** agar unit murni strata — ini invarian metodologis yang tidak boleh dilonggarkan (lihat [Invarian metodologi](../rules/methodology-invariants.md)). Pada P7 ini menghasilkan n = 34 sel; **sejak FASE 1 aturan sel minimum `MIN_CELL_GT = 30` (Subbab 3.11.5) berlaku sehingga n = 24 sel** per pasangan, dengan 12 sel dibuang dan dilaporkan terpisah pada kolom `sel_dibuang`.
 
 Metrik default `metric="ap5095"` (AP@0,5:0,95); tersedia pula `metric="ap50"` untuk keluaran `wilcoxon_ap50.csv`. Dimensi strata: ukuran (small/medium/large), oklusi (no/partial/heavy), densitas (sparse/medium/dense) — lihat [Evaluasi](evaluation.md) dan [Dataset](dataset.md).
 
@@ -57,25 +57,41 @@ di mana W⁺/W⁻ adalah jumlah peringkat selisih positif/negatif (peringkat dih
 
 ## 7. Hasil aktual P7 (18 Jul 2026)
 
-Wilcoxon signed-rank, unit AP50-95 per (kelas × strata), **n = 34 sel**. Sumber: `eval_out/wilcoxon_ap5095.csv`; ringkasan penuh di [progres](../status/progress.md) dan `hasil/ringkasan_evaluasi.md`.
+Wilcoxon signed-rank, unit AP50-95 per (kelas × strata), **n = 24 sel** (pasca-FASE 1, aturan sel-min-30). Sumber: `eval_out/wilcoxon_ap5095.csv` + `eval_out/bootstrap_ci.csv`; grafik & narasi siap-pakai di `hasil_bab4_5/04_ablasi_deteksi/`.
 
 | Hipotesis (utama) | W | p | rank-biserial r | median Δ | Kesimpulan 5% |
 |---|---|---|---|---|---|
-| **V8 vs V1** (penuh vs baseline) | 255 | 0,478 | +0,143 | +0,001 | tidak signifikan |
-| **V4 vs V1** (DALW saja vs baseline) | 240 | 0,469 | −0,144 | −0,013 | tidak signifikan |
-| **V8 vs V5** (+DALW atas HAM+P2) | 153 | **0,0125** | **+0,486** | +0,025 | **SIGNIFIKAN** |
+| **H1: V8 vs V1** (penuh vs baseline) | 129 | 0,565 | +0,140 | −0,0002 | tidak signifikan (CI bootstrap [+0,05; +2,08] pp tak memuat nol) |
+| **H2: V4 vs V1** (DALW saja vs baseline) | 105 | 0,208 | −0,300 | −0,0133 | **tidak didukung** (CI [−1,21; +1,00] pp memuat nol) |
+| **H3: V8 vs V5** (+DALW atas HAM+P2) | 77 | **0,0367** | **+0,487** | +0,0207 | **SIGNIFIKAN** (CI [+1,26; +3,53] pp tak memuat nol) |
 
 **Sekunder signifikan pasca-Holm** (`family="secondary"`): V2 vs V8 (p_holm = 0,009; V8 > V2), V6 vs V8 (p_holm = 0,016; V8 > V6), dan V1 vs V2 (p_holm = 0,037; V1 > V2 — HAM-saja justru di bawah baseline pada strata). Pasangan lain tidak signifikan setelah koreksi.
 
-Nilai desimal di narasi memakai koma (p = 0,0125; r = +0,486); nilai apa adanya di CSV/kode memakai titik (`0.0125`, `0.486`, ambang `p_eff < 0.05`).
+Nilai desimal di narasi memakai koma (p = 0,0367; r = +0,487); nilai apa adanya di CSV/kode memakai titik (`0.0125`, `0.486`, ambang `p_eff < 0.05`).
 
 ## 8. Interpretasi jujur — komplementer, memicu A-01
 
-Baik model penuh (V8) maupun DALW-saja (V4) **tidak** mengungguli baseline secara signifikan pada AP terstratifikasi agregat; V4−V1 bahkan bermedian sedikit negatif (−0,013). Namun **kontribusi marginal DALW nyata dan signifikan ketika ditumpangkan pada arsitektur** (V8 vs V5: p = 0,0125, efek sedang-besar r = +0,486). Artinya nilai Pembobotan *Loss* Berbasis Densitas bersifat **komplementer/kondisional** terhadap HAM + P2, bukan berdiri sendiri.
+Baik model penuh (V8) maupun DALW-saja (V4) **tidak** mengungguli baseline secara signifikan pada AP terstratifikasi agregat; V4−V1 bahkan bermedian sedikit negatif (−0,0133) dengan ukuran efek negatif (r = −0,300), sehingga **dilarang** dinarasikan sebagai "kecenderungan positif". Namun **kontribusi marginal DALW nyata dan signifikan ketika ditumpangkan pada arsitektur** (V8 vs V5: p = 0,0367, efek sedang r = +0,487, dan selang bootstrap [+1,26; +3,53] poin persen yang tak memuat nol). Artinya nilai Pembobotan *Loss* Berbasis Densitas bersifat **komplementer/kondisional** terhadap HAM + P2, bukan berdiri sendiri.
 
 Ini hasil ilmiah yang sah dan selaras dengan framing dua-pilar (DALW = penyempurnaan atas *baseline* yang sudah kuat). Karena tiga hipotesis utama tidak seluruhnya signifikan, temuan ini **memicu keputusan pending A-01** (redaksi/alternatif abstrak bila hasil tidak signifikan) — itu keputusan Naufal bersama pembimbing, **bukan** diputuskan di basis pengetahuan ini. Jangan mengisi placeholder atau menulis draf BAB 4–5 berdasarkan angka di atas.
 
 Peringatan reliabilitas yang wajib menyertai penafsiran: strata **occlusion/heavy hanya 8 GT** di test (AP tak bermakna statistik), dan **size/large V4−V1 = +0,175** diduga derau sampel kecil (n = 240) — keduanya jangan diangkat sebagai klaim. Detail di [Evaluasi](evaluation.md).
+
+
+## ⚠️ Narasi strata WAJIB memakai aturan sel yang sama dengan uji
+
+Angka selisih AP per strata untuk narasi BAB 4 **harus** dihitung hanya dari sel
+`n_gt ≥ MIN_CELL_GT`, sama seperti uji Wilcoxon. Memakai seluruh sel untuk narasi sementara
+uji memakai sel tersaring adalah inkonsistensi yang membalik kesimpulan:
+
+| Strata | V8−V1 semua sel | V8−V1 sel n_gt≥30 |
+|---|---|---|
+| ukuran kecil | +5,06 pp | **+0,87 pp** (angka besar berasal dari sel *big-vehicle* n=17) |
+| densitas *dense* | +3,28 pp | **−1,31 pp** — dan satu-satunya kelas yang lolos adalah **pejalan kaki** |
+
+Sumber resmi angka narasi: `hasil_bab4_5/04_ablasi_deteksi/delta_strata.csv` (dibangkitkan
+`y26_bangun_hasil_bab45.py`; kolom `layak_dinarasikan` menandai strata yang hanya bersisa satu
+kelas atau hanya pejalan kaki). **Strata *dense* tidak dapat dinarasikan untuk kendaraan.**
 
 ## Tautan terkait
 
