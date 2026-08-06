@@ -899,6 +899,8 @@ def konsolidasi_arsip():
 
     # -- 14 naskah hasil ----------------------------------------------------
     n += _salin(ROOT / "TESIS_BAB4-5.docx", OUT / "14_naskah/TESIS_BAB4-5.docx")
+    n += _salin(ROOT / "TESIS_BAB1-3_REVISI_SIDANG_v8.docx",
+                OUT / "14_naskah/TESIS_BAB1-3_REVISI_SIDANG_v8.docx")
 
     print(f"  {n} berkas dikonsolidasikan ke {OUT}/")
     return n
