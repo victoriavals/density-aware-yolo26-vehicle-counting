@@ -1,0 +1,13 @@
+varian,kelas,n_gt,n_terlewat,fn_persen,n_salah_kelas
+V1,big-vehicle,332,63,18.98,29
+V1,car,765,164,21.44,11
+V1,pedestrian,638,119,18.65,8
+V1,two-wheeler,865,268,30.98,6
+V5,big-vehicle,332,79,23.8,20
+V5,car,765,155,20.26,21
+V5,pedestrian,638,102,15.99,15
+V5,two-wheeler,865,188,21.73,6
+V8,big-vehicle,332,53,15.96,31
+V8,car,765,133,17.39,33
+V8,pedestrian,638,85,13.32,6
+V8,two-wheeler,865,270,31.21,7
