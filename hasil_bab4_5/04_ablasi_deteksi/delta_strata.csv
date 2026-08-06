@@ -1,0 +1,28 @@
+pasangan,dim,stratum,n_kelas_semua,delta_pp_semua_sel,n_kelas_selmin,delta_pp_selmin,kelas_dipakai,kelas_dibuang,layak_dinarasikan
+V8-V1,size,small,4,+5.06,3,+0.87,car; pedestrian; two-wheeler,big-vehicle(n=17),ya
+V8-V1,size,medium,4,-0.19,4,-0.19,big-vehicle; car; pedestrian; two-wheeler,,ya
+V8-V1,size,large,4,+6.45,2,+0.52,big-vehicle; car,pedestrian(n=1); two-wheeler(n=1),ya
+V8-V1,occlusion,no,4,+1.11,4,+1.11,big-vehicle; car; pedestrian; two-wheeler,,ya
+V8-V1,occlusion,partial,4,+0.56,3,+3.72,car; pedestrian; two-wheeler,big-vehicle(n=27),ya
+V8-V1,occlusion,heavy,2,-8.79,0,,,big-vehicle(n=2); pedestrian(n=2),TIDAK - semua sel < 30 GT
+V8-V1,density,sparse,4,-0.90,3,-0.74,big-vehicle; car; two-wheeler,pedestrian(n=21),ya
+V8-V1,density,medium,4,-1.53,4,-1.53,big-vehicle; car; pedestrian; two-wheeler,,ya
+V8-V1,density,dense,4,+3.28,1,-1.31,pedestrian,big-vehicle(n=1); car(n=11); two-wheeler(n=21),TIDAK - hanya pedestrian (kelas konteks) yang lolos
+V4-V1,size,small,4,+2.96,3,-0.30,car; pedestrian; two-wheeler,big-vehicle(n=17),ya
+V4-V1,size,medium,4,-0.96,4,-0.96,big-vehicle; car; pedestrian; two-wheeler,,ya
+V4-V1,size,large,4,+17.52,2,+2.63,big-vehicle; car,pedestrian(n=1); two-wheeler(n=1),ya
+V4-V1,occlusion,no,4,+0.09,4,+0.09,big-vehicle; car; pedestrian; two-wheeler,,ya
+V4-V1,occlusion,partial,4,-0.51,3,-2.49,car; pedestrian; two-wheeler,big-vehicle(n=27),ya
+V4-V1,occlusion,heavy,2,-8.26,0,,,big-vehicle(n=2); pedestrian(n=2),TIDAK - semua sel < 30 GT
+V4-V1,density,sparse,4,-1.86,3,-1.83,big-vehicle; car; two-wheeler,pedestrian(n=21),ya
+V4-V1,density,medium,4,-1.60,4,-1.60,big-vehicle; car; pedestrian; two-wheeler,,ya
+V4-V1,density,dense,4,-3.31,1,-4.51,pedestrian,big-vehicle(n=1); car(n=11); two-wheeler(n=21),TIDAK - hanya pedestrian (kelas konteks) yang lolos
+V8-V5,size,small,4,+6.17,3,+3.02,car; pedestrian; two-wheeler,big-vehicle(n=17),ya
+V8-V5,size,medium,4,+1.09,4,+1.09,big-vehicle; car; pedestrian; two-wheeler,,ya
+V8-V5,size,large,4,-7.84,2,-0.83,big-vehicle; car,pedestrian(n=1); two-wheeler(n=1),ya
+V8-V5,occlusion,no,4,+2.32,4,+2.32,big-vehicle; car; pedestrian; two-wheeler,,ya
+V8-V5,occlusion,partial,4,+5.28,3,+5.37,car; pedestrian; two-wheeler,big-vehicle(n=27),ya
+V8-V5,occlusion,heavy,2,-3.39,0,,,big-vehicle(n=2); pedestrian(n=2),TIDAK - semua sel < 30 GT
+V8-V5,density,sparse,4,+6.61,3,+2.18,big-vehicle; car; two-wheeler,pedestrian(n=21),ya
+V8-V5,density,medium,4,+0.89,4,+0.89,big-vehicle; car; pedestrian; two-wheeler,,ya
+V8-V5,density,dense,4,+2.92,1,-6.61,pedestrian,big-vehicle(n=1); car(n=11); two-wheeler(n=21),TIDAK - hanya pedestrian (kelas konteks) yang lolos
