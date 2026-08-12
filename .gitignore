@@ -21,3 +21,4 @@ inits/
 cfg/
 *.pt
 .queue_ketegaran.sh
+webtest/temp/
