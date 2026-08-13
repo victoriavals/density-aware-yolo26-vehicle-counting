@@ -21,7 +21,7 @@ lokasi sumbernya dicantumkan agar dapat diperiksa ulang. Butir yang merupakan
 | K-09 | ✅ tersedia | epoch & detik/epoch kedelapan varian |
 | K-10 | ✅ terjawab | Keduanya benar — beda konvensi, bukan kontradiksi |
 | K-11 | ✅ tersedia | Fraksi berprediksi-tunggal = 1 − miss − dup |
-| K-12 | 🔄 berjalan | 10.000 resample × 3 seed, non-destruktif |
+| K-12 | ✅ **selesai** | 10.000×3 seed: V8vsV5 tegar; V8vsV1 batas bawah +0,003…+0,02 pp = praktis nol |
 | K-13 | 🔸 keputusan | Rekomendasi tegas: **kosongkan** |
 | K-15 | 🔸 keputusan | Rekomendasi **(a)** — prasyarat K-07 & K-08 terpenuhi |
 | K-16 | ❌ tidak diketahui | Tidak ada di repo; hanya alamat pembimbing yang tercatat |
@@ -299,7 +299,7 @@ proksi terdekat, atau saya hitung ulang (murah).
 
 ---
 
-## K-12 — Bootstrap 10.000 resample 🔄 BERJALAN
+## K-12 — Bootstrap 10.000 resample ✅ SELESAI
 
 **Ya, dan Anda benar bahwa yang sekarang rawan.** Pada n_boot = 1.000:
 
@@ -312,15 +312,38 @@ proksi terdekat, atau saya hitung ulang (murah).
 Batas bawah V8 vs V1 hanya **+0,05 poin persen** → memang rawan berubah tanda karena galat
 Monte Carlo bootstrap itu sendiri.
 
-Sedang berjalan: **10.000 resample × 3 seed (0, 1, 2)**, memakai ulang cache pencocokan
-(`eval_out/cache_V*.npz`) sehingga **tanpa inferensi ulang**. **Non-destruktif** — hasil ditulis ke
-`eval_out/bootstrap_ci_10000.csv`; `bootstrap_ci.csv` (1.000) **tidak ditimpa** agar dapat dibandingkan.
-Skrip permanen baru: **`k12_bootstrap_10k.py`**.
+**Sudah dijalankan** (`k12_bootstrap_10k.py`, skrip permanen baru): **10.000 resample × 3 seed
+(0, 1, 2)**, memakai ulang cache pencocokan `eval_out/cache_V*.npz` sehingga **tanpa inferensi
+ulang**. **Non-destruktif** — hasil di `eval_out/bootstrap_ci_10000.csv`; `bootstrap_ci.csv`
+(1.000 resample) tidak ditimpa. Waktu jalan ±13,7 jam (`map_from_sample` berulang di Python).
 
-**Poin substantif:** V8 vs V5 (`ci_lo` = +0,0126, frac positif 1,000) **tegar**. Yang rawan hanya V8 vs V1 —
-dan **H1 memang sudah tidak signifikan** (p = 0,565). Jadi bila tandanya berbalik, **kesimpulan tidak
-berubah sedikit pun**; yang hilang justru selang yang tampak menguntungkan secara menyesatkan.
-Saran: laporkan sebaran 3 seed agar kestabilannya terlihat.
+Titik estimasi **cocok persis** dengan berkas 1.000-resample (mAP V8 0,540397429…,
+V1 0,530219566…, selisih 0,010177863…) → jalur kode & cache identik, hanya pengambilan ulangnya
+yang berbeda.
+
+**Hasil n_boot = 10.000, per seed:**
+
+| Pasangan | seed | CI 95 % bawah | CI 95 % atas | frac positif | tanpa nol |
+|---|---|---|---|---|---|
+| V8 vs V1 | 0 | **+0,000216** | +0,020438 | 0,9775 | ya |
+| V8 vs V1 | 1 | **+0,000035** | +0,020402 | 0,9755 | ya |
+| V8 vs V1 | 2 | **+0,000122** | +0,020570 | 0,9763 | ya |
+| V4 vs V1 | 0–2 | −0,01280 … −0,01251 | +0,00968 … +0,01012 | 0,408–0,423 | tidak |
+| V8 vs V5 | 0–2 | **+0,011257 … +0,011389** | +0,03441 … +0,03485 | **1,000** | ya |
+
+**Tafsiran yang jujur:**
+- **V8 vs V1** — selang **masih** tidak memuat nol pada ketiga seed, tetapi batas bawahnya
+  **+0,0035 s.d. +0,022 poin persen**, yakni **praktis tak terbedakan dari nol** (pada seed 1
+  hanya +0,0035 pp). Digabung Wilcoxon **p = 0,565**, bacaan yang dapat dipertahankan adalah
+  **tidak ada perbaikan yang andal** — jangan sekali-kali menyajikan "selang tidak memuat nol"
+  sebagai bukti keunggulan; itu akan terbaca sebagai memilih uji yang menguntungkan.
+- **V4 vs V1** — memuat nol pada ketiga seed, konsisten p = 0,208. Stabil, tidak signifikan.
+- **V8 vs V5** — **tegar**: batas bawah +0,0113 pp dan `frac_positif` **1,000** pada ketiga seed.
+  Inilah satu-satunya temuan yang kokoh di ketiga uji (Wilcoxon p = 0,0367, r = +0,487).
+
+**Saran pelaporan:** cantumkan ketiga seed (atau rentang antar-seed) agar pembaca melihat
+kestabilannya sendiri, dan naikkan `n_boot` dari 1.000 → 10.000 di METHOD sesuai yang benar-benar
+dijalankan.
 
 ---
 
