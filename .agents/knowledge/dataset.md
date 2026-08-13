@@ -1,13 +1,41 @@
 # Dataset traffic-merged & Group Split — traffic-merged Dataset & Group Split
 
-> **EN — TL;DR:** `traffic-merged` = 3,389 primary Jakarta CCTV images, 4 classes (two-wheeler dominant; **pedestrian is context only — never counted**). The original Roboflow export leaked (3 byte-identical pairs across splits), so we discard it and re-split **by group** (camera × scene × session) with `make_group_split.py` → deterministic 2.372/679/338 images, 672/53/33 groups, 0 md5/group violations. The live `dataset/` folder IS that re-split; `bukti_split_*.csv` are the thesis appendix. Two open discrepancies to surface (never resolve): Roboflow source workspace vs citation [17], and split counts.
+> **EN — TL;DR:** `traffic-merged` = 3,389 images, 4 classes (two-wheeler dominant; **pedestrian is context only — never counted**). ⚠️ **The "primary Jakarta CCTV" description is unsupported** — a 13 Aug 2026 provenance audit found the identifiable CCTV is from **Yogyakarta, Demak and Banjarmasin**, only 42.1 % of images are Indonesian CCTV at all (47.1 % are web/catalogue stills, 10.8 % stock footage from Seoul/Mecca/New York/Netherlands), and **315 images carry third-party watermarks** (248 of them in `train`). The original Roboflow export leaked (3 byte-identical pairs across splits), so we discard it and re-split **by group** (camera × scene × session) with `make_group_split.py` → deterministic 2.372/679/338 images, 672/53/33 groups, 0 md5/group violations — but a pHash test later found **3 near-duplicate pairs at Hamming 0** that md5 could not see, one of them `train`↔`test`. The live `dataset/` folder IS that re-split; `bukti_split_*.csv` are the thesis appendix. Manuscript wording for the provenance corrections is **still open** (Decisions 9–11).
 
 Dokumen ini merangkum sumber data, alasan *group-based split*, mekanika `make_group_split.py`, dan artefak bukti yang dipakai BAB 3/4. Referensi silang: atribut stratifikasi & AP dijelaskan di [Evaluasi & Stratifikasi](evaluation.md); unit uji statistik di [Statistik](statistics.md); invarian metodologis yang mengunci angka split di [Invarian Metodologi](../rules/methodology-invariants.md).
 
 ## 1. Identitas dataset
 
-- **Nama:** `traffic-merged` — 3.389 citra CCTV lalu lintas Jakarta, **data primer** (mayoritas kamera dipasang peneliti sendiri).
+> ## 🔴 PERINGATAN PROVENANS (13 Agu 2026) — jangan mengulang klaim di bawah tanpa membaca ini
+>
+> Audit + verifikasi mandiri (FASE 0–4) menemukan **tiga klaim identitas dataset tidak
+> didukung bukti**. Angka & bukti: [`../../hasil_bab4_5/VERIFIKASI_PROVENANS_FASE0-4.md`](../../hasil_bab4_5/VERIFIKASI_PROVENANS_FASE0-4.md).
+>
+> | Klaim | Status |
+> |---|---|
+> | "CCTV lalu lintas **Jakarta**" | ❌ overlay terbaca menunjukkan **Yogyakarta, Demak, Banjarmasin**; satu-satunya rekaman mirip Jakarta justru **stok Shutterstock** |
+> | "**data primer**, mayoritas kamera dipasang peneliti" | ❌ overlay lembaga pihak ketiga (ATCS/CSR, Dishub), artefak "Activate Windows" + taskbar (**rekam layar**), logo **EZVIZ** (kamera konsumen) |
+> | "3.389 citra **CCTV**" | ❌ hanya **1.427 (42,1 %)** CCTV Indonesia; **1.597 (47,1 %)** citra web/katalog; **365 (10,8 %)** rekaman stok (Seoul, Mekkah, New York, Belanda) |
+>
+> Selain itu: **315 citra ber-tanda-air** pihak ketiga (train 248 · valid 34 · test 33) —
+> bukan 67 seperti audit awal. Dan uji pHash membuktikan **kebocoran near-duplicate**
+> (3 pasangan jarak Hamming 0, satu `train`↔`test`) yang **tidak terdeteksi** pemeriksaan
+> md5 pada §2 di bawah — jadi klaim "0 pelanggaran" hanya berlaku untuk duplikat *byte-identik*.
+>
+> **Kabar baik:** 248 citra ber-tanda-air tambahan **seluruhnya di `train`**, sehingga
+> `valid`/`test` tidak berubah dan angka BAB 4 tidak terpengaruh. Uji ketegaran tiga subset
+> menunjukkan **H3 tetap signifikan** (p 0,0366 / 0,0395 / 0,0229).
+>
+> ⚠️ Redaksi naskah untuk ketiga klaim ini **masih TERBUKA** (Keputusan 9–11 di
+> [`../../catatan_keputusan.md`](../../catatan_keputusan.md)) — menunggu Naufal + pembimbing.
+> Jangan "memperbaiki" naskah atas inisiatif sendiri; jangan pula mengulang klaim lama
+> sebagai fakta.
+
+- **Nama:** `traffic-merged` — 3.389 citra, 4 kelas. ⚠️ Deskripsi lama "citra CCTV lalu
+  lintas Jakarta, **data primer** (mayoritas kamera dipasang peneliti sendiri)"
+  **tidak didukung bukti** — lihat peringatan di atas.
 - **Sitasi tesis [17]:** `universe.roboflow.com/naufalfirdaus/traffic-merged-qke0k-3yyyo`.
+  ⚠️ Versi terpublikasi masih memuat 315 citra ber-tanda-air (persoalan lisensi terbuka).
 - **Empat kelas** (urutan indeks di `data.yaml`, lihat `make_group_split.py` baris `names = [...]`):
 
 | Idx | Kelas | Peran | Catatan |
