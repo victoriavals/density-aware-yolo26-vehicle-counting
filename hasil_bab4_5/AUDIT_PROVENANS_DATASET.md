@@ -1,5 +1,28 @@
 # Audit provenans dataset `traffic-merged` — temuan 13 Agu 2026
 
+> ## ⚠️ SEBAGIAN ANGKA DI BAWAH SUDAH DIKOREKSI
+>
+> Dokumen ini adalah **audit awal berbasis pola nama berkas**, ditulis sebagai *hipotesis*.
+> Verifikasi mandiri (FASE 0–4, 13 Agu 2026) menguji hipotesis itu dan sebagian **gugur**.
+> **Angka yang berlaku ada di [`VERIFIKASI_PROVENANS_FASE0-4.md`](VERIFIKASI_PROVENANS_FASE0-4.md).**
+>
+> | Yang dikoreksi | Dokumen ini | Terverifikasi |
+> |---|---|---|
+> | Citra ber-tanda-air | 67 | **315** (248 tambahan, **semuanya di `train`**) |
+> | CCTV asli | 1.792 (52,9 %) | **1.427 (42,1 %)** |
+> | Lokasi CCTV | Yogyakarta + Demak | **+ Banjarmasin** (kota ketiga) |
+> | Rekaman asing | tidak diketahui | **Seoul · Mekkah · New York · Belanda** |
+> | Kebocoran near-duplicate | dugaan (§2.4 butir 3) | **terbukti: 3 pasangan pHash jarak 0, 1 di `train`↔`test`** |
+> | Pemegang hak | Shutterstock | Shutterstock **+ kanal "NL Cycling"** |
+>
+> Yang **tetap berlaku**: keberadaan tanda air Shutterstock, klaim "Jakarta" tidak
+> didukung bukti, klaim "kamera dipasang peneliti" tidak didukung bukti, dan 1.597 citra
+> (47,1 %) bukan CCTV. Kabar baiknya — **split evaluasi tidak berubah**: 248 citra
+> ber-tanda-air tambahan seluruhnya di `train`, sehingga `valid`/`test` tetap 34/33 dan
+> angka BAB 4 tidak terpengaruh kurang-hitung ini.
+>
+> Dokumen ini **sengaja tidak dihapus**: ia merekam bagaimana temuan muncul (aturan §12.8).
+
 > Ditemukan **tidak sengaja** saat memilih bingkai untuk gambar jurnal: bingkai uji terpadat
 > (`night-traffic-9_mp4-0055`) ternyata memuat **tanda air "shutterstock"** di tengah citra.
 > Penelusuran lanjutan atas seluruh 3.389 citra memunculkan tiga persoalan yang **harus
