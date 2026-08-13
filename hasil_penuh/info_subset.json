@@ -1,0 +1,47 @@
+{
+  "subset": "penuh",
+  "alasan": "seluruh citra uji (kontrol reproduksi)",
+  "n_citra_asal": 338,
+  "n_citra": 338,
+  "n_gt": 2600,
+  "dibuang": [],
+  "n_boot": 1000,
+  "boot_seed": 0,
+  "min_cell_gt": 30,
+  "hipotesis": {
+    "V8vsV1": {
+      "n": 24,
+      "p": 0.5645889043807983,
+      "r": 0.14,
+      "median": -0.00023510814540417257,
+      "signif": false,
+      "n_dibuang": 12,
+      "ci_lo": 0.0005063339253343116,
+      "ci_hi": 0.02079278236016123,
+      "diff": 0.01017786285556832
+    },
+    "V4vsV1": {
+      "n": 24,
+      "p": 0.20761656761169434,
+      "r": -0.3,
+      "median": -0.013299740799054383,
+      "signif": false,
+      "n_dibuang": 12,
+      "ci_lo": -0.012058507259818612,
+      "ci_hi": 0.009997211263603936,
+      "diff": -0.001692489308977807
+    },
+    "V8vsV5": {
+      "n": 24,
+      "p": 0.036649227142333984,
+      "r": 0.4866666666666667,
+      "median": 0.020681458879313386,
+      "signif": true,
+      "n_dibuang": 12,
+      "ci_lo": 0.012576630972547152,
+      "ci_hi": 0.03526857071076295,
+      "diff": 0.022913720608398802
+    }
+  },
+  "catatan": "Dibentuk dengan menyaring cache_V*.npz menurut nama berkas; tanpa inferensi ulang, tanpa pelatihan ulang."
+}
