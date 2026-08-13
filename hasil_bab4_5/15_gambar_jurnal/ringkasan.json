@@ -1,0 +1,71 @@
+{
+  "citra": "night-traffic-5_mp4-0028_jpg.rf.WiS4loX9lB4ekbsgjqZ9.jpg",
+  "ukuran": [
+    1144,
+    638
+  ],
+  "conf": 0.25,
+  "iou": 0.5,
+  "wilayah_zoom": [
+    149.2,
+    13.9,
+    721.2,
+    332.9
+  ],
+  "kelas": {
+    "0": "big-vehicle",
+    "1": "car",
+    "2": "pedestrian",
+    "3": "two-wheeler"
+  },
+  "varian": [
+    {
+      "varian": "V1",
+      "n_gt": 18,
+      "n_pred": 17,
+      "TP": 13,
+      "FP": 4,
+      "FN": 5,
+      "recall": 0.7222,
+      "presisi": 0.7647,
+      "per_kelas": {
+        "car": {
+          "gt": 3,
+          "tp": 2,
+          "fn": 1,
+          "fp": 2
+        },
+        "two-wheeler": {
+          "gt": 15,
+          "tp": 11,
+          "fn": 4,
+          "fp": 2
+        }
+      }
+    },
+    {
+      "varian": "V8",
+      "n_gt": 18,
+      "n_pred": 19,
+      "TP": 14,
+      "FP": 5,
+      "FN": 4,
+      "recall": 0.7778,
+      "presisi": 0.7368,
+      "per_kelas": {
+        "car": {
+          "gt": 3,
+          "tp": 2,
+          "fn": 1,
+          "fp": 1
+        },
+        "two-wheeler": {
+          "gt": 15,
+          "tp": 12,
+          "fn": 3,
+          "fp": 4
+        }
+      }
+    }
+  ]
+}
