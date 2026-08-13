@@ -26,6 +26,34 @@ loss end-to-end).
 | `evaluate_all.py` | Orkestrator evaluasi BAB 4 (global + strata + Wilcoxon) | Subbab 3.11 |
 | `test_eval.py` | Uji evaluasi Tahap 3 | — |
 
+### Audit provenans & uji ketegaran komposisi data (13 Agu 2026)
+
+Ditambahkan setelah audit provenans menemukan citra ber-tanda-air pihak ketiga, lokasi
+dataset yang tidak sesuai naskah, dan kebocoran *near-duplicate* yang lolos pemeriksaan
+md5. Hasil lengkap: [`hasil_bab4_5/VERIFIKASI_PROVENANS_FASE0-4.md`](hasil_bab4_5/VERIFIKASI_PROVENANS_FASE0-4.md);
+keputusan: [`catatan_keputusan.md`](catatan_keputusan.md).
+
+| Berkas | Fungsi | Keluaran |
+|---|---|---|
+| `integritas_artefak.py` | Manifest md5 dataset+bobot (`--buat` / `--periksa`) — bukti tidak ada pelatihan ulang | `beku_20260813/md5_*.txt` |
+| `provenans_audit.py` | Klasifikasi sumber 3.389 citra + lembar kontak pemeriksaan mata | `provenans.csv`, `anotasi_provenans/` |
+| `uji_phash.py` | pHash 64-bit (PIL + `scipy.fft`, jpg **dan** png) → kebocoran near-duplicate lintas split | `phash_pasangan.csv`, `phash_eksklusi_test.txt` |
+| `audit_watermark_frame.py` | Klaster pHash `frame_*` + lembar miniatur & **potongan resolusi asli** | `anotasi_provenans/klaster_frame.csv`, `watermark_frame_tambahan.csv` |
+| `eval_subset.py` | Evaluasi ulang subset uji **dengan menyaring `cache_V*.npz`** (tanpa inferensi/pelatihan ulang) + kontrol reproduksi | `hasil_penuh/`, `hasil_bersih/`, `hasil_cctv/` |
+| `delta_strata_subset.py` | Selisih AP per strata, aturan sel-minimum K4, untuk subset mana pun | `<subset>/delta_strata.csv` |
+
+```bash
+python integritas_artefak.py --buat --keluar beku_20260813   # Fase 0 (kriteria: 3.389 baris)
+python provenans_audit.py                                    # Fase 1
+python uji_phash.py                                          # Fase 2
+python eval_subset.py --n-boot 1000                          # Fase 3+4 (± 50 mnt, tanpa GPU)
+python delta_strata_subset.py hasil_penuh hasil_bersih hasil_cctv
+python integritas_artefak.py --periksa --keluar beku_20260813 # Fase 7
+```
+
+⚠️ Subset `penuh` adalah **kontrol reproduksi**: wajib mereproduksi p = 0,5646 / 0,2076 /
+0,0366. Bila tidak, penyaringan cache cacat dan subset lain tidak boleh ditafsirkan.
+
 ## Persiapan lingkungan (PC RTX 4060)
 
 ```bash
