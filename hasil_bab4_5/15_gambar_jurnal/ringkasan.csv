@@ -1,0 +1,3 @@
+varian,n_gt,n_pred,TP,FP,FN,recall,presisi
+V1,18,17,13,4,5,0.7222,0.7647
+V8,18,19,14,5,4,0.7778,0.7368
