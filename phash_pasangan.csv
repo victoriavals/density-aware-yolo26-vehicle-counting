@@ -1,0 +1,4 @@
+split_a,berkas_a,kategori_a,split_b,berkas_b,kategori_b,jarak_hamming
+train,Bus-Damri-1-768x480_jpg.rf.bMhflYIgqS5IDfb7RIw1.jpg,web_katalog,test,Bus-Damri-1_jpg.rf.gm5kTdkPqNvN3EkT6AuO.jpg,web_katalog,0
+train,202101188092986_jpg.rf.EzxY0lxa26n9lAJ3PFmg.jpg,web_katalog,valid,202102038642374_jpg.rf.mjQIktX3Uj9NB7723JAP.jpg,web_katalog,0
+train,DAMRI-1-1_jpg.rf.0TFpmlAmDb1wVNCiCj58.jpg,web_katalog,valid,DAMRI-1_jpg.rf.AT7bV1prNajcmJp7ePpw.jpg,web_katalog,0
