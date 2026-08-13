@@ -135,12 +135,17 @@ def gambar_panel(ax, rgb, hasil, crop=None, lw=1.1):
 
 
 def label_panel(ax, huruf, judul, sub):
-    ax.text(0.012, 0.975, huruf, transform=ax.transAxes, ha="left", va="top",
+    # Label (a)/(b)/(c) digeser TURUN agar tidak menutupi tera waktu CCTV yang berada di
+    # pita paling atas bingkai (temuan telaah pembimbing D-A4, 13 Agu 2026). Overlay tera
+    # waktu & lokasi adalah bukti provenans sehingga tidak boleh tertutup.
+    ax.text(0.012, 0.905, huruf, transform=ax.transAxes, ha="left", va="top",
             fontsize=9, fontweight="bold", color="white",
             bbox=dict(boxstyle="square,pad=0.28", fc="#000000", ec="none", alpha=0.72))
-    ax.set_title(judul, fontsize=8, fontweight="bold", pad=3.5, loc="left")
-    # subjudul dipusatkan & boleh dua baris agar tidak bertabrakan antarpanel
-    ax.set_xlabel(sub, fontsize=6.4, labelpad=2.5, color="#333", ha="center")
+    ax.set_title(judul, fontsize=8.5, fontweight="bold", pad=3.5, loc="left")
+    # Subjudul dipusatkan & boleh dua baris agar tidak bertabrakan antarpanel. Ukuran
+    # dinaikkan 6,4 -> 7,4 pt agar angka di bawah panel nyaman dibaca pada lebar cetak
+    # 16,99 cm (D-A4); masih di bawah ukuran teks isi sehingga tidak bersaing dengannya.
+    ax.set_xlabel(sub, fontsize=7.4, labelpad=2.5, color="#333", ha="center")
 
 
 def simpan(fig, dasar: Path, tiff=False):
