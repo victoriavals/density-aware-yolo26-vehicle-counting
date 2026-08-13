@@ -22,3 +22,11 @@ cfg/
 *.pt
 .queue_ketegaran.sh
 webtest/temp/
+# Pembekuan Fase 0 provenans: salinan lokal dataset+bobot+dokumen (3,1 GB). Manifest md5
+# di dalamnya dapat dibangkitkan ulang oleh integritas_artefak.py; folder ini lokal saja.
+beku_20260813/
+# Lembar kontak audit tanda air (18 MB): citra turunan, dapat dibangkitkan ulang oleh
+# provenans_audit.py / audit_watermark_frame.py. Keputusan mata-nya yang WAJIB ter-track,
+# yaitu berkas .csv/.txt di folder yang sama (daftar klaster & citra ber-tanda-air).
+anotasi_provenans/*.jpg
+anotasi_provenans/*.png
