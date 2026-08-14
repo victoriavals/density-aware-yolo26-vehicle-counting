@@ -30,3 +30,10 @@ beku_20260813/
 # yaitu berkas .csv/.txt di folder yang sama (daftar klaster & citra ber-tanda-air).
 anotasi_provenans/*.jpg
 anotasi_provenans/*.png
+# Audit web_katalog: 1.543 citra turunan / 223 MB (1.452 potongan resolusi asli + lembar
+# kontak). Seluruhnya dibangkitkan ulang oleh `python audit_web_katalog.py`. Yang WAJIB
+# ter-track hanya keputusan mata dan peta klasternya — .csv/.txt/.md, total ±200 KB.
+anotasi_web/**/*.jpg
+anotasi_web/**/*.png
+anotasi_web/*.jpg
+anotasi_web/*.png
